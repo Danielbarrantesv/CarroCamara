@@ -1,5 +1,6 @@
 package com.danielbarrantesv.dashcam.ui.camera
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +49,7 @@ import androidx.camera.view.PreviewView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.danielbarrantesv.dashcam.ui.theme.HudAmber
 import com.danielbarrantesv.dashcam.ui.theme.HudDim
 import com.danielbarrantesv.dashcam.ui.theme.HudGreen
@@ -56,12 +58,27 @@ import com.danielbarrantesv.dashcam.ui.theme.HudWhite
 import com.danielbarrantesv.dashcam.ui.theme.Primary
 import com.danielbarrantesv.dashcam.util.Formatters
 
+/** Walk up the Context chain to find the Activity. */
+private tailrec fun android.content.Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
+
 @Composable
-fun CameraScreen(
-    viewModel: CameraViewModel = hiltViewModel()
-) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+fun CameraScreen() {
+    // Scope the ViewModel to the Activity (not the NavBackStackEntry) so that
+    // switching tabs doesn't destroy the recording. The camera use cases stay
+    // bound to the Activity lifecycle.
     val ctx = LocalContext.current
+    val activity = ctx as? Activity ?: ctx.findActivity()
+    val viewModel: CameraViewModel = if (activity is androidx.activity.ComponentActivity) {
+        viewModel(viewModelStoreOwner = activity)
+    } else {
+        hiltViewModel()
+    }
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -74,17 +91,20 @@ fun CameraScreen(
         }
     }
 
-    // Rebind camera whenever lensFacing changes OR on first composition
+    // Rebind camera whenever lensFacing changes OR on first composition.
+    // Only bind if not currently recording (to avoid interrupting an active recording).
     LaunchedEffect(state.lensFacing) {
         viewModel.bindCamera(lifecycleOwner, previewView)
     }
 
-    // Cleanup when leaving the screen (stops recording gracefully)
-    // The ViewModel's onCleared will also handle this, but we call cleanup
-    // explicitly so the recording stops before the screen disappears.
+    // IMPORTANT: We do NOT call viewModel.cleanup() on dispose.
+    // The ViewModel is activity-scoped, so it survives tab switches.
+    // The camera and recording continue while the user is in other tabs.
+    // Cleanup happens only in ViewModel.onCleared() (when the activity dies).
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.cleanup()
+            // Just release the preview surface — keep recording alive
+            viewModel.releasePreview()
         }
     }
 

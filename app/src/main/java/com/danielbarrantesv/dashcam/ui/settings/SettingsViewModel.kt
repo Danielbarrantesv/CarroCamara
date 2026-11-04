@@ -1,5 +1,6 @@
 package com.danielbarrantesv.dashcam.ui.settings
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -7,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danielbarrantesv.dashcam.MainActivity
 import com.danielbarrantesv.dashcam.data.prefs.AppLanguage
 import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
@@ -107,7 +109,14 @@ class SettingsViewModel @Inject constructor(
 
     fun setLanguage(lang: AppLanguage) = viewModelScope.launch {
         repo.setLanguage(lang)
-        // Apply immediately via AppCompatDelegate (works without restarting the app)
+        // Apply immediately via AppCompatDelegate (works for resources loaded via R.string.*).
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang.tag))
+        // Recreate the activity so Compose UI recomposes with the new locale.
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            currentActivity?.recreate()
+        }
     }
+
+    /** Set by SettingsScreen via DisposableEffect so we can recreate the right activity. */
+    @Volatile var currentActivity: Activity? = null
 }

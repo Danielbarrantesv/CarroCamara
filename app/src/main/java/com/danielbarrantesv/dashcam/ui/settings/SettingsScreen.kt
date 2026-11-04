@@ -31,10 +31,12 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +55,16 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val ctx = LocalContext.current
+
+    // Track current activity so the ViewModel can recreate it after a language change
+    DisposableEffect(Unit) {
+        viewModel.currentActivity = ctx as? android.app.Activity
+            ?: (ctx as? android.content.ContextWrapper)?.baseContext as? android.app.Activity
+        onDispose {
+            if (viewModel.currentActivity === ctx) viewModel.currentActivity = null
+        }
+    }
 
     // SAF picker launcher
     val storagePicker = rememberLauncherForActivityResult(

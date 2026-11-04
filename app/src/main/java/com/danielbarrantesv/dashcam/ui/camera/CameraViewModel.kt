@@ -87,6 +87,9 @@ class CameraViewModel @Inject constructor(
     private var primaryCapture: VideoCapture<Recorder>? = null
     // Secondary capture (only used when dual-camera recording is enabled)
     private var secondaryCapture: VideoCapture<Recorder>? = null
+    // Preview use case — kept around so we can re-attach the surface when the user
+    // returns to the camera screen without re-binding everything.
+    private var previewUseCase: Preview? = null
     private var primaryRecording: Recording? = null
     private var secondaryRecording: Recording? = null
 
@@ -135,6 +138,16 @@ class CameraViewModel @Inject constructor(
             return
         }
 
+        // If recording is in progress, just re-attach the preview surface
+        // without disturbing the active recording. This is what lets the user
+        // switch tabs and come back without losing the recording.
+        if (_state.value.isRecording) {
+            try {
+                previewUseCase?.setSurfaceProvider(previewView.surfaceProvider)
+            } catch (_: Exception) {}
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val provider = getCameraProvider(ctx)
@@ -143,6 +156,7 @@ class CameraViewModel @Inject constructor(
                 val preview = Preview.Builder().build().also { p ->
                     p.setSurfaceProvider(previewView.surfaceProvider)
                 }
+                previewUseCase = preview
 
                 val quality = settings.videoQuality.first()
                 val recorder = buildRecorder(quality)
@@ -154,10 +168,20 @@ class CameraViewModel @Inject constructor(
 
                 provider.unbindAll()
 
-                val dualEnabled = settings.dualCameraEnabled.first() &&
-                    try { provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) && provider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) } catch (_: Exception) { false }
+                // ===== Dual camera detection =====
+                val dualRequested = settings.dualCameraEnabled.first()
+                val concurrentSupported = try {
+                    provider.availableConcurrentCameraInfos.isNotEmpty()
+                } catch (_: Exception) { false }
 
-                if (dualEnabled) {
+                if (dualRequested && !concurrentSupported) {
+                    _state.value = _state.value.copy(
+                        error = "Tu dispositivo no soporta grabación con doble cámara. " +
+                            "Se grabará solo con la cámara seleccionada."
+                    )
+                }
+
+                if (dualRequested && concurrentSupported) {
                     // Use CameraX ConcurrentCamera API (CameraX 1.4+)
                     val backSelector = if (_state.value.lensFacing == CameraSelector.LENS_FACING_BACK)
                         CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
@@ -169,7 +193,6 @@ class CameraViewModel @Inject constructor(
                     val frontRecorder = buildRecorder(quality)
                     val frontCapture = VideoCapture.withOutput(frontRecorder)
 
-                    // Decide which one is "primary" (its preview we show)
                     val primaryCap: VideoCapture<Recorder>
                     val secondaryCap: VideoCapture<Recorder>
 
@@ -200,7 +223,7 @@ class CameraViewModel @Inject constructor(
                         primaryCapture = primaryCap
                         secondaryCapture = secondaryCap
                     } catch (e: Exception) {
-                        // Concurrent camera not supported — fall back to single
+                        Log.w(TAG, "Concurrent camera bind failed, falling back to single", e)
                         provider.bindToLifecycle(lifecycleOwner, backSelector, preview, backCapture)
                         primaryCapture = backCapture
                         secondaryCapture = null
@@ -211,7 +234,7 @@ class CameraViewModel @Inject constructor(
                     secondaryCapture = null
                 }
 
-                _state.value = _state.value.copy(isCameraBound = true, error = null)
+                _state.value = _state.value.copy(isCameraBound = true)
                 startGpsStream()
             } catch (e: Exception) {
                 Log.e(TAG, "bindCamera failed", e)
@@ -221,6 +244,17 @@ class CameraViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    /**
+     * Releases the preview surface without stopping the recording.
+     * Called when the user navigates away from the camera screen but the
+     * recording should continue.
+     */
+    fun releasePreview() {
+        try {
+            previewUseCase?.setSurfaceProvider(null)
+        } catch (_: Exception) {}
     }
 
     private fun buildRecorder(quality: VideoQuality): Recorder {

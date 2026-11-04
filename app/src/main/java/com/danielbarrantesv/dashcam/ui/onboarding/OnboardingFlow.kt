@@ -80,6 +80,9 @@ fun OnboardingFlow(onFinish: () -> Unit) {
     val context = LocalContext.current
     var step by remember { mutableIntStateOf(0) }
 
+    // Selected language (default: Spanish)
+    var selectedLanguage by remember { mutableStateOf(com.danielbarrantesv.dashcam.data.prefs.AppLanguage.ES) }
+
     // Permissions state
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -119,23 +122,34 @@ fun OnboardingFlow(onFinish: () -> Unit) {
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         when (step) {
-            0 -> WelcomeStep(onContinue = { step = 1 })
-            1 -> StorageStep(
+            0 -> LanguageStep(
+                selected = selectedLanguage,
+                onSelect = { lang ->
+                    selectedLanguage = lang
+                    // Apply immediately so the rest of the onboarding shows in the chosen language
+                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                        androidx.core.os.LocaleListCompat.forLanguageTags(lang.tag)
+                    )
+                },
+                onContinue = { step = 1 }
+            )
+            1 -> WelcomeStep(onContinue = { step = 2 })
+            2 -> StorageStep(
                 storageGb = storageGb,
                 onStorageChange = { storageGb = it },
                 quality = quality,
                 onQualityChange = { quality = it },
                 unit = unit,
                 onUnitChange = { unit = it },
-                onContinue = { step = 2 }
+                onContinue = { step = 3 }
             )
-            2 -> StorageFolderStep(
+            3 -> StorageFolderStep(
                 customUri = customStorageUri,
                 onPickFolder = { storagePicker.launch(null) },
                 onClearFolder = { customStorageUri = null },
-                onContinue = { step = 3 }
+                onContinue = { step = 4 }
             )
-            3 -> PermissionsStep(
+            4 -> PermissionsStep(
                 permissionsState = permissionsState,
                 onBackgroundLocationRequest = {
                     bgLocationLauncher.launch(Permissions.backgroundLocation)
@@ -147,7 +161,9 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                     val qualityFinal = quality
                     val unitFinal = unit
                     val finalUri = customStorageUri
+                    val finalLang = selectedLanguage
                     MainScope().launch {
+                        prefs.setLanguage(finalLang)
                         prefs.setStorageLimitGb(storageFinalGb)
                         prefs.setVideoQuality(qualityFinal)
                         prefs.setSpeedUnit(unitFinal)
@@ -157,6 +173,62 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                     }
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun LanguageStep(
+    selected: com.danielbarrantesv.dashcam.data.prefs.AppLanguage,
+    onSelect: (com.danielbarrantesv.dashcam.data.prefs.AppLanguage) -> Unit,
+    onContinue: () -> Unit
+) {
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(
+                "Selecciona tu idioma",
+                style = DashCamTypography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Choose your language / Choisissez votre langue / 选择您的语言 / 言語を選択 / Wählen Sie Ihre Sprache",
+                style = DashCamTypography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(32.dp))
+
+            com.danielbarrantesv.dashcam.data.prefs.AppLanguage.entries.forEach { lang ->
+                val isSelected = lang == selected
+                Button(
+                    onClick = { onSelect(lang) },
+                    modifier = Modifier.fillMaxWidth().height(56.dp).padding(vertical = 4.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSelected) Primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                ) {
+                    Text(
+                        lang.display,
+                        fontWeight = FontWeight.SemiBold,
+                        style = DashCamTypography.titleMedium
+                    )
+                }
+            }
+        }
+
+        Button(
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+        ) {
+            Text("Continuar / Continue / Continuer / 继续 / 続ける / Weiter", color = Color.Black, fontWeight = FontWeight.SemiBold, style = DashCamTypography.labelMedium)
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
         }
     }
 }
