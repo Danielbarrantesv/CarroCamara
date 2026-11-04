@@ -43,6 +43,11 @@
     <string name="onboarding_perm_notifications_desc">Contrôle de l\'enregistrement et alertes</string>
     <string name="onboarding_perm_grant_button">Accorder les autorisations</string>
     <string name="onboarding_perm_bg_location_button">Demander la localisation en arrière-plan</string>
+    <string name="onboarding_perm_bg_location_hint">Pour la localisation en arrière-plan, après avoir accordé la localisation, vous devez la demander séparément.</string>
+
+    <string name="onboarding_storage_quality_title">Qualité vidéo</string>
+    <string name="onboarding_storage_unit_title">Unité de vitesse</string>
+    <string name="onboarding_storage_minutes_hint">min de vidéo à 1080p</string>
 
     <!-- Settings: sections -->
     <string name="settings_section_camera">Caméra</string>
@@ -70,6 +75,12 @@
     <!-- Settings: language -->
     <string name="settings_language_title">Langue de l\'app</string>
     <string name="settings_language_desc">Changez la langue. Appliqué immédiatement.</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">Version</string>
+    <string name="settings_about_author_label">Auteur</string>
+    <string name="settings_about_repo_label">Dépôt</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
     <!-- Settings: permissions -->
     <string name="perm_camera_title">Caméra</string>

@@ -83,12 +83,9 @@ fun SettingsScreen(
         }
     }
 
-    // Single permission launcher (re-used for each permission row)
-    val permLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { _ -> /* UI recomposes via state flow */ }
-
-    // Force recomposition when permissions change (after returning from system settings)
+    // Force recomposition when permissions change (after returning from system settings
+    // or after the permission launcher returns). The trigger is read by each PermissionRow
+    // so Compose knows it depends on this state.
     var permRefreshTrigger by remember { mutableStateOf(0) }
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -100,8 +97,14 @@ fun SettingsScreen(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    // Read permRefreshTrigger so recomposition happens on resume
-    @Suppress("UNUSED_EXPRESSION") permRefreshTrigger
+
+    // Single permission launcher (re-used for each permission row)
+    val permLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // Force recomposition by incrementing the trigger
+        permRefreshTrigger++
+    }
 
     LazyColumn(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
@@ -246,6 +249,9 @@ fun SettingsScreen(
 
         item {
             SectionHeader(stringResource(R.string.settings_section_permissions))
+            // Read the trigger so the whole permissions section recomposes when it changes.
+            // (Just touching the variable here is enough; Compose tracks the read.)
+            permRefreshTrigger
             SettingsCard {
                 PermissionRow(
                     title = stringResource(R.string.perm_camera_title),
@@ -311,13 +317,13 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Acerca de")
+            SectionHeader(stringResource(R.string.settings_section_about))
             SettingsCard {
-                InfoRow("Versión", "1.0.3")
+                InfoRow(stringResource(R.string.settings_about_version_label), "1.0.8")
                 DividerLine()
-                InfoRow("Autor", "Daniel Barrantes Villarevia")
+                InfoRow(stringResource(R.string.settings_about_author_label), stringResource(R.string.settings_about_author_value))
                 DividerLine()
-                InfoRow("Repositorio", "github.com/Danielbarrantesv/CarroCamara")
+                InfoRow(stringResource(R.string.settings_about_repo_label), "github.com/Danielbarrantesv/CarroCamara")
             }
         }
     }

@@ -44,6 +44,11 @@
     <string name="onboarding_perm_notifications_desc">Recording control and alerts</string>
     <string name="onboarding_perm_grant_button">Grant permissions</string>
     <string name="onboarding_perm_bg_location_button">Request background location</string>
+    <string name="onboarding_perm_bg_location_hint">For background location, after granting location, you must request it separately.</string>
+
+    <string name="onboarding_storage_quality_title">Video quality</string>
+    <string name="onboarding_storage_unit_title">Speed unit</string>
+    <string name="onboarding_storage_minutes_hint">min of video at 1080p</string>
 
     <!-- Settings: sections -->
     <string name="settings_section_camera">Camera</string>
@@ -71,6 +76,12 @@
     <!-- Settings: language -->
     <string name="settings_language_title">App language</string>
     <string name="settings_language_desc">Change the language. Applied immediately.</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">Version</string>
+    <string name="settings_about_author_label">Author</string>
+    <string name="settings_about_repo_label">Repository</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
     <!-- Settings: permissions -->
     <string name="perm_camera_title">Camera</string>

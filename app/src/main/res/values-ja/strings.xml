@@ -40,6 +40,11 @@
     <string name="onboarding_perm_notifications_desc">録画制御とアラート</string>
     <string name="onboarding_perm_grant_button">権限を付与</string>
     <string name="onboarding_perm_bg_location_button">バックグラウンド位置情報を要求</string>
+    <string name="onboarding_perm_bg_location_hint">バックグラウンド位置情報については、位置情報を付与した後、別途要求する必要があります。</string>
+
+    <string name="onboarding_storage_quality_title">動画品質</string>
+    <string name="onboarding_storage_unit_title">速度単位</string>
+    <string name="onboarding_storage_minutes_hint">分間の 1080p 動画</string>
 
     <string name="settings_section_camera">カメラ</string>
     <string name="settings_section_others">その他</string>
@@ -62,6 +67,12 @@
 
     <string name="settings_language_title">アプリ言語</string>
     <string name="settings_language_desc">言語を変更。即座に適用されます。</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">バージョン</string>
+    <string name="settings_about_author_label">作者</string>
+    <string name="settings_about_repo_label">リポジトリ</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
     <string name="perm_camera_title">カメラ</string>
     <string name="perm_camera_desc">動画録画に必要</string>

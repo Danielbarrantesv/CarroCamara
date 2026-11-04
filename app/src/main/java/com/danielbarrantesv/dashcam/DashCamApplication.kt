@@ -3,21 +3,18 @@ package com.danielbarrantesv.dashcam
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
-import com.danielbarrantesv.dashcam.util.LocaleHelper
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 /**
@@ -25,7 +22,7 @@ import javax.inject.Inject
  *  - Hilt dependency injection
  *  - WorkManager with HiltWorkerFactory
  *  - Notification channels (recording, events, transfer)
- *  - Apply persisted language on cold start (via attachBaseContext + onCreate)
+ *  - Apply persisted language on cold start
  */
 @HiltAndroidApp
 class DashCamApplication : Application(), Configuration.Provider {
@@ -43,35 +40,9 @@ class DashCamApplication : Application(), Configuration.Provider {
             .setWorkerFactory(workerFactory)
             .build()
 
-    /**
-     * Apply the persisted locale synchronously before any Activity is created.
-     * We use runBlocking here because attachBaseContext runs BEFORE onCreate and
-     * BEFORE Hilt injection completes — we cannot use the injected settings field yet.
-     *
-     * We instantiate a one-off SettingsRepository using the wrapped base context.
-     */
-    override fun attachBaseContext(base: Context) {
-        // Read the persisted language tag synchronously.
-        // DataStore on first run is fast (one file read) and this only happens at
-        // process startup, so the blocking call is acceptable.
-        var languageTag: String? = null
-        try {
-            // We use a temporary SettingsRepository that reads from the base context.
-            // Hilt isn't ready yet, so we construct it manually.
-            val tempSettings = SettingsRepository(base)
-            // runBlocking + first() to get the current value synchronously.
-            languageTag = runBlocking { tempSettings.language.first().tag }
-        } catch (_: Exception) {
-            // If DataStore isn't ready, fall back to system default.
-        }
-        super.attachBaseContext(LocaleHelper.applyAtStartup(base, languageTag))
-    }
-
     override fun onCreate() {
-        super.onCreate()
-        createNotificationChannels()
-        // Also apply via AppCompatDelegate (redundant with attachBaseContext but
-        // covers the case where the Activity is recreated without process death).
+        // Apply persisted language BEFORE super.onCreate so the first activity
+        // inflates with the correct locale.
         appScope.launch {
             try {
                 val lang = settings.language.first()
@@ -80,6 +51,8 @@ class DashCamApplication : Application(), Configuration.Provider {
                 )
             } catch (_: Exception) {}
         }
+        super.onCreate()
+        createNotificationChannels()
     }
 
     private fun createNotificationChannels() {
@@ -124,5 +97,4 @@ class DashCamApplication : Application(), Configuration.Provider {
         const val CHANNEL_TRANSFER = "transfer"
     }
 }
-
 

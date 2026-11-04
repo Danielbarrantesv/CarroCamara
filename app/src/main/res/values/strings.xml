@@ -45,6 +45,12 @@
     <string name="onboarding_perm_notifications_desc">Control de grabación y alertas</string>
     <string name="onboarding_perm_grant_button">Conceder permisos</string>
     <string name="onboarding_perm_bg_location_button">Solicitar ubicación en segundo plano</string>
+    <string name="onboarding_perm_bg_location_hint">Para ubicación en segundo plano, después de conceder ubicación, debes solicitarla por separado.</string>
+
+    <!-- Onboarding: storage step -->
+    <string name="onboarding_storage_quality_title">Calidad de video</string>
+    <string name="onboarding_storage_unit_title">Unidad de velocidad</string>
+    <string name="onboarding_storage_minutes_hint">min de video en 1080p</string>
 
     <!-- Settings: sections -->
     <string name="settings_section_camera">Cámara</string>
@@ -72,6 +78,12 @@
     <!-- Settings: language -->
     <string name="settings_language_title">Idioma de la app</string>
     <string name="settings_language_desc">Cambia el idioma. Se aplica inmediatamente.</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">Versión</string>
+    <string name="settings_about_author_label">Autor</string>
+    <string name="settings_about_repo_label">Repositorio</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
     <!-- Settings: permissions -->
     <string name="perm_camera_title">Cámara</string>

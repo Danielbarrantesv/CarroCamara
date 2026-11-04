@@ -40,6 +40,11 @@
     <string name="onboarding_perm_notifications_desc">录制控制和警报</string>
     <string name="onboarding_perm_grant_button">授予权限</string>
     <string name="onboarding_perm_bg_location_button">请求后台位置</string>
+    <string name="onboarding_perm_bg_location_hint">对于后台位置，授予位置后，您必须单独请求。</string>
+
+    <string name="onboarding_storage_quality_title">视频质量</string>
+    <string name="onboarding_storage_unit_title">速度单位</string>
+    <string name="onboarding_storage_minutes_hint">分钟 1080p 视频</string>
 
     <string name="settings_section_camera">摄像头</string>
     <string name="settings_section_others">其他</string>
@@ -62,6 +67,12 @@
 
     <string name="settings_language_title">应用语言</string>
     <string name="settings_language_desc">更改语言。立即应用。</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">版本</string>
+    <string name="settings_about_author_label">作者</string>
+    <string name="settings_about_repo_label">仓库</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
     <string name="perm_camera_title">摄像头</string>
     <string name="perm_camera_desc">录制视频所需</string>

@@ -128,13 +128,16 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                 selected = selectedLanguage,
                 onSelect = { lang ->
                     selectedLanguage = lang
-                    // Persist immediately
+                    // Persist immediately so it survives recreate
                     val prefs = SettingsRepository(context)
-                    MainScope().launch {
-                        prefs.setLanguage(lang)
-                    }
-                    // Apply via LocaleHelper (AppCompatDelegate + LocaleManager + Locale.setDefault)
-                    com.danielbarrantesv.dashcam.util.LocaleHelper.applyLanguage(context, lang.tag)
+                    MainScope().launch { prefs.setLanguage(lang) }
+                    // Apply locale via AppCompatDelegate
+                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                        androidx.core.os.LocaleListCompat.forLanguageTags(lang.tag)
+                    )
+                    // Force activity recreate so the LanguageStep itself re-renders
+                    // in the new locale (the selected button + description).
+                    (context as? android.app.Activity)?.recreate()
                 },
                 onContinue = { step = 1 }
             )
@@ -166,8 +169,9 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                     val qualityFinal = quality
                     val unitFinal = unit
                     val finalUri = customStorageUri
-                    // Note: language was already persisted when selected in step 0
+                    val finalLang = selectedLanguage
                     MainScope().launch {
+                        prefs.setLanguage(finalLang)
                         prefs.setStorageLimitGb(storageFinalGb)
                         prefs.setVideoQuality(qualityFinal)
                         prefs.setSpeedUnit(unitFinal)
@@ -306,19 +310,19 @@ private fun StorageStep(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
-            Text("Configura tu almacenamiento", style = DashCamTypography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.onboarding_storage_title), style = DashCamTypography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Indica cuánto espacio en disco destinar a los videos. Cuando se llene, los más antiguos se borrarán automáticamente.",
+                stringResource(R.string.onboarding_storage_body),
                 style = DashCamTypography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(32.dp))
 
             // Storage slider
-            Text("${storageGb.toInt()} GB", style = DashCamTypography.displayMedium, color = Primary)
+            Text("${storageGb.toInt()} ${stringResource(R.string.onboarding_storage_unit)}", style = DashCamTypography.displayMedium, color = Primary)
             Text(
-                "≈ ${"%.0f".format(storageGb * 12)} min de video en 1080p",
+                "≈ ${"%.0f".format(storageGb * 12)} ${stringResource(R.string.onboarding_storage_minutes_hint)}",
                 style = DashCamTypography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -332,7 +336,7 @@ private fun StorageStep(
             Spacer(Modifier.height(32.dp))
 
             // Video quality
-            Text("Calidad de video", style = DashCamTypography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.onboarding_storage_quality_title), style = DashCamTypography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(8.dp))
             Row(
                 Modifier.fillMaxWidth(),
@@ -351,7 +355,7 @@ private fun StorageStep(
             Spacer(Modifier.height(32.dp))
 
             // Speed unit
-            Text("Unidad de velocidad", style = DashCamTypography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.onboarding_storage_unit_title), style = DashCamTypography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(8.dp))
             Row(
                 Modifier.fillMaxWidth(),
@@ -507,21 +511,21 @@ private fun PermissionsStep(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
-            Text("Permisos necesarios", style = DashCamTypography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
+            Text(stringResource(R.string.onboarding_permissions_title), style = DashCamTypography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.height(8.dp))
             Text(
-                "DashCam necesita varios permisos para funcionar correctamente en segundo plano.",
+                stringResource(R.string.onboarding_permissions_body),
                 style = DashCamTypography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(24.dp))
 
             val items = buildList {
-                add(PermItem(Icons.Filled.PhotoCamera, "Cámara", "Para grabar video", Permissions.isCameraGranted(context)))
-                add(PermItem(Icons.Filled.Mic, "Micrófono", "Audio opcional", Permissions.isAudioGranted(context)))
-                add(PermItem(Icons.Filled.LocationOn, "Ubicación", "Velocidad, ruta GPS, kilometraje", Permissions.isLocationGranted(context)))
-                add(PermItem(Icons.Filled.LocationOn, "Ubicación en segundo plano", "GPS mientras la app está minimizada", Permissions.isBackgroundLocationGranted(context)))
-                add(PermItem(Icons.Filled.Notifications, "Notificaciones", "Control de grabación y alertas", Permissions.isNotificationsGranted(context)))
+                add(PermItem(Icons.Filled.PhotoCamera, stringResource(R.string.onboarding_perm_camera_title), stringResource(R.string.onboarding_perm_camera_desc), Permissions.isCameraGranted(context)))
+                add(PermItem(Icons.Filled.Mic, stringResource(R.string.onboarding_perm_mic_title), stringResource(R.string.onboarding_perm_mic_desc), Permissions.isAudioGranted(context)))
+                add(PermItem(Icons.Filled.LocationOn, stringResource(R.string.onboarding_perm_location_title), stringResource(R.string.onboarding_perm_location_desc), Permissions.isLocationGranted(context)))
+                add(PermItem(Icons.Filled.LocationOn, stringResource(R.string.onboarding_perm_bg_location_title), stringResource(R.string.onboarding_perm_bg_location_desc), Permissions.isBackgroundLocationGranted(context)))
+                add(PermItem(Icons.Filled.Notifications, stringResource(R.string.onboarding_perm_notifications_title), stringResource(R.string.onboarding_perm_notifications_desc), Permissions.isNotificationsGranted(context)))
             }
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -537,12 +541,12 @@ private fun PermissionsStep(
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text("Conceder permisos", color = Color.Black, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.onboarding_perm_grant_button), color = Color.Black, fontWeight = FontWeight.SemiBold)
             }
             Spacer(Modifier.height(12.dp))
 
             Text(
-                "Para ubicación en segundo plano, después de conceder ubicación, debes solicitarla por separado.",
+                stringResource(R.string.onboarding_perm_bg_location_hint),
                 style = DashCamTypography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -554,7 +558,7 @@ private fun PermissionsStep(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
-            ) { Text("Solicitar ubicación en segundo plano") }
+            ) { Text(stringResource(R.string.onboarding_perm_bg_location_button)) }
 
             Spacer(Modifier.height(16.dp))
 
@@ -563,7 +567,7 @@ private fun PermissionsStep(
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text("Comenzar a grabar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.onboarding_start), color = Color.Black, fontWeight = FontWeight.SemiBold)
             }
         }
     }

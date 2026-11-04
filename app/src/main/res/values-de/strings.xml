@@ -40,6 +40,11 @@
     <string name="onboarding_perm_notifications_desc">Aufnahmekontrolle und Warnungen</string>
     <string name="onboarding_perm_grant_button">Berechtigungen gewähren</string>
     <string name="onboarding_perm_bg_location_button">Hintergrundstandort anfordern</string>
+    <string name="onboarding_perm_bg_location_hint">Für Hintergrundstandort musst du den Standort nach dem Gewähren separat anfordern.</string>
+
+    <string name="onboarding_storage_quality_title">Videoqualität</string>
+    <string name="onboarding_storage_unit_title">Geschwindigkeitseinheit</string>
+    <string name="onboarding_storage_minutes_hint">Min. Video bei 1080p</string>
 
     <string name="settings_section_camera">Kamera</string>
     <string name="settings_section_others">Andere</string>
@@ -62,6 +67,12 @@
 
     <string name="settings_language_title">App-Sprache</string>
     <string name="settings_language_desc">Sprache ändern. Wird sofort angewendet.</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">Version</string>
+    <string name="settings_about_author_label">Autor</string>
+    <string name="settings_about_repo_label">Repository</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
     <string name="perm_camera_title">Kamera</string>
     <string name="perm_camera_desc">Erforderlich für Videoaufnahme</string>
