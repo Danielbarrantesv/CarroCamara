@@ -230,7 +230,7 @@ private fun ReportCard(report: ReportEntity, onOpen: (File) -> Unit) {
                 Text(file.name, style = DashCamTypography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "${Formatters.dateTime(report.createdAt)} · ${Formatters.formatBytes(report.fileSizeBytes)}",
+                    "${Formatters.dateTime(report.createdAt)} · ${FileUtils.formatBytes(report.fileSizeBytes)}",
                     style = DashCamTypography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

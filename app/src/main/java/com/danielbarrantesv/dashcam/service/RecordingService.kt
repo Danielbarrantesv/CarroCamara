@@ -87,7 +87,7 @@ class RecordingService : LifecycleService() {
             notif,
             ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION or
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_RECORDING
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
         )
 
         acquireWakeLock()
@@ -182,7 +182,7 @@ class RecordingService : LifecycleService() {
                     _uiState.value = _uiState.value.copy(gForce = peakG)
                 }
 
-                val type = gForceDetector.classify(sample, threshold) ?: continue
+                val type = gForceDetector.classify(sample, threshold) ?: return@collect
 
                 val lat = _uiState.value.lat
                 val lon = _uiState.value.lon

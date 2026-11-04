@@ -44,6 +44,7 @@ import com.danielbarrantesv.dashcam.ui.theme.HudAmber
 import com.danielbarrantesv.dashcam.ui.theme.HudGreen
 import com.danielbarrantesv.dashcam.ui.theme.HudRed
 import com.danielbarrantesv.dashcam.ui.theme.Primary
+import com.danielbarrantesv.dashcam.util.FileUtils
 import com.danielbarrantesv.dashcam.util.Formatters
 
 @Composable
@@ -156,7 +157,7 @@ private fun TripCard(trip: TripEntity) {
                 Spacer(Modifier.height(12.dp))
                 Text(
                     "G máx: ${"%.2f".format(trip.maxGForce)} g  ·  ${trip.videoSegmentCount} videos  ·  ${
-                        Formatters.formatBytes(trip.totalStorageBytes)
+                        FileUtils.formatBytes(trip.totalStorageBytes)
                     }",
                     style = DashCamTypography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

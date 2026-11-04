@@ -8,11 +8,11 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
+import androidx.camera.video.PendingRecording
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture as VideoCaptureV2
 import androidx.camera.video.VideoRecordEvent
-import androidx.camera.video.VideoRecordEvent.Status
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.danielbarrantesv.dashcam.data.model.VideoSegmentEntity
@@ -149,16 +149,19 @@ class LoopRecorder @Inject constructor(
             val outFile = FileUtils.videoFileForSegment(context, tripId, index)
             val outputOpts = FileOutputOptions.Builder(outFile).build()
 
-            val pending = capture.output.prepareRecording(context, outputOpts)
+            val pending: PendingRecording = capture.output.prepareRecording(context, outputOpts)
 
             activeRecording = if (audioEnabled) {
-                pending.startAudioRecording(
-                    ContextCompat.getMainExecutor(context)
-                ) { event -> handleVideoEvent(event, tripId, index, outFile) }
+                pending
+                    .withAudioEnabled()
+                    .start(ContextCompat.getMainExecutor(context)) { event ->
+                        handleVideoEvent(event, tripId, index, outFile)
+                    }
             } else {
-                pending.start(
-                    ContextCompat.getMainExecutor(context)
-                ) { event -> handleVideoEvent(event, tripId, index, outFile) }
+                pending
+                    .start(ContextCompat.getMainExecutor(context)) { event ->
+                        handleVideoEvent(event, tripId, index, outFile)
+                    }
             }
 
             _state.value = _state.value.copy(
@@ -178,7 +181,7 @@ class LoopRecorder @Inject constructor(
         when (event) {
             is VideoRecordEvent.Status -> Unit
             is VideoRecordEvent.Finalize -> {
-                if (event.status == Status.FINALIZED) {
+                if (!event.hasError()) {
                     val durationMs =
                         System.currentTimeMillis() - _state.value.currentSegmentStartMs
                     scope.launch {

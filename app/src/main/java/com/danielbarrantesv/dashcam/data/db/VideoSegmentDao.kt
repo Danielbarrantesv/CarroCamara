@@ -38,8 +38,8 @@ interface VideoSegmentDao {
     @Query("SELECT COUNT(*) FROM video_segments WHERE isProtected = 1")
     suspend fun protectedCount(): Int
 
-    @Query("UPDATE video_segments SET isProtected = :protected WHERE id = :id")
-    suspend fun setProtected(id: Long, protected: Boolean)
+    @Query("UPDATE video_segments SET isProtected = :value WHERE id = :id")
+    suspend fun setProtected(id: Long, value: Boolean)
 
     @Query("DELETE FROM video_segments WHERE id = :id")
     suspend fun deleteById(id: Long)

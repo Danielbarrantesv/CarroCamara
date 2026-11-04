@@ -107,14 +107,12 @@ class DashCamHttpServer(
         val fis = FileInputStream(file)
         val response = if (range != null) {
             val (start, end) = range
-            val skipped = fis.skip(start)
+            fis.skip(start)
             val length = end - start + 1
-            newChunkedResponse(Response.Status.PARTIAL_CONTENT, mime, fis.buffered())
-                .apply {
-                    addHeader("Content-Range", "bytes $start-$end/${file.length()}")
-                    addHeader("Accept-Ranges", "bytes")
-                    setContentLengthLong(length)
-                }
+            newChunkedResponse(Response.Status.PARTIAL_CONTENT, mime, fis.buffered()).apply {
+                addHeader("Content-Range", "bytes $start-$end/${file.length()}")
+                addHeader("Accept-Ranges", "bytes")
+            }
         } else {
             newFixedLengthResponse(Response.Status.OK, mime, fis, file.length())
                 .apply { addHeader("Accept-Ranges", "bytes") }
@@ -123,7 +121,6 @@ class DashCamHttpServer(
     }
 
     private fun getRangeHeader(): Pair<Long, Long>? {
-        val req = System.getProperty("rangeReq") ?: return null
         return null
     }
 

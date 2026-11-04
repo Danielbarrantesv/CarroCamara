@@ -10,13 +10,14 @@ import com.danielbarrantesv.dashcam.DashCamApplication
 import com.danielbarrantesv.dashcam.MainActivity
 import com.danielbarrantesv.dashcam.R
 import com.danielbarrantesv.dashcam.util.Formatters
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Builds all dashcam notifications. Singleton to keep notification IDs consistent. */
 @Singleton
 class NotificationHelper @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     companion object {
         const val NOTIF_RECORDING_ID = 1001

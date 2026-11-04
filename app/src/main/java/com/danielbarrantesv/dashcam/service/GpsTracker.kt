@@ -37,8 +37,7 @@ class GpsTracker @Inject constructor(
         }
 
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, intervalMs)
-            .setMinUpdateIntervalMs(intervalMs)
-            .setMaxUpdateDelayMs(intervalMs * 2)
+            .setMaxUpdateDelayMillis(intervalMs * 2)
             .setWaitForAccurateLocation(false)
             .build()
 

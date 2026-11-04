@@ -14,7 +14,7 @@ import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
-import com.itextpdf.kernel.pdf.canvas.draw.SolidLine
+import com.itextpdf.kernel.pdf.canvas.draw.DashedLine
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
@@ -96,7 +96,9 @@ class PdfGenerator @Inject constructor() {
             ).setBorder(Border.NO_BORDER).setPaddingTop(0f)
         )
         doc.add(headerTable)
-        doc.add(LineSeparator(SolidLine(1f).setColor(brandOrange)).setMarginTop(8f).setMarginBottom(16f))
+        val sep = DashedLine(1f)
+        sep.color = brandOrange
+        doc.add(LineSeparator(sep).setMarginTop(8f).setMarginBottom(16f))
 
         // ===== Section: Policy holder / vehicle / incident =====
         doc.add(sectionTitle("Datos del reporte", bold))
@@ -143,7 +145,7 @@ class PdfGenerator @Inject constructor() {
         summary.addCell(metricCell("G máximo", "${"%.2f".format(input.trip.maxGForce)} g", regular))
         summary.addCell(metricCell("Eventos", "${input.trip.eventCount}", regular))
         summary.addCell(metricCell("Videos", "${input.trip.videoSegmentCount}", regular))
-        summary.addCell(metricCell("Almacenamiento", Formatters.formatBytes(input.trip.totalStorageBytes), regular))
+        summary.addCell(metricCell("Almacenamiento", FileUtils.formatBytes(input.trip.totalStorageBytes), regular))
         doc.add(summary)
         doc.add(Paragraph("").setMarginBottom(12f))
 
@@ -215,7 +217,9 @@ class PdfGenerator @Inject constructor() {
         doc.add(Paragraph("").setMarginBottom(20f))
 
         // ===== Footer / disclaimer =====
-        doc.add(LineSeparator(SolidLine(0.5f).setColor(midGray)))
+        val sep2 = DashedLine(0.5f)
+        sep2.color = midGray
+        doc.add(LineSeparator(sep2))
         doc.add(
             Paragraph(
                 "Documento generado automáticamente por DashCam. Los datos provienen de los sensores del dispositivo móvil y se entregan sin modificación. Cualquier discrepancia con otros registros debe verificarse con la fuente original."
