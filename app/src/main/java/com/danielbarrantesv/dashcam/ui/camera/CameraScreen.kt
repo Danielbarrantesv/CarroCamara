@@ -1,6 +1,5 @@
 package com.danielbarrantesv.dashcam.ui.camera
 
-import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,17 +8,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
-import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Videocam
@@ -27,21 +29,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.camera.view.PreviewView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.danielbarrantesv.dashcam.service.RecordingService
-import com.danielbarrantesv.dashcam.ui.theme.DashCamTypography
 import com.danielbarrantesv.dashcam.ui.theme.HudAmber
 import com.danielbarrantesv.dashcam.ui.theme.HudDim
 import com.danielbarrantesv.dashcam.ui.theme.HudGreen
@@ -49,9 +54,6 @@ import com.danielbarrantesv.dashcam.ui.theme.HudRed
 import com.danielbarrantesv.dashcam.ui.theme.HudWhite
 import com.danielbarrantesv.dashcam.ui.theme.Primary
 import com.danielbarrantesv.dashcam.util.Formatters
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 
 @Composable
 fun CameraScreen(
@@ -59,47 +61,59 @@ fun CameraScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val ctx = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    // Real PreviewView — created once, reused across recompositions
+    val previewView = remember {
+        PreviewView(ctx).apply {
+            scaleType = PreviewView.ScaleType.FILL_CENTER
+            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+        }
+    }
+
+    // Rebind camera whenever lensFacing changes OR on first composition
+    LaunchedEffect(state.lensFacing) {
+        viewModel.bindCamera(lifecycleOwner, previewView)
+    }
 
     Box(
         Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color.Black)
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
-        // Camera preview placeholder (real preview surface would be AndroidView with PreviewView)
-        CameraPreviewPlaceholder()
+        // ============ Real camera preview ============
+        AndroidView(
+            factory = { previewView },
+            modifier = Modifier.fillMaxSize()
+        )
 
-        // HUD overlay
+        // Dark gradient overlay on edges for HUD legibility
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.45f),
+                            Color.Transparent,
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.55f)
+                        )
+                    )
+                )
+        )
+
+        // ============ HUD overlay ============
         HudOverlay(
             state = state,
             isLandscape = isLandscape,
             modifier = Modifier.fillMaxSize()
         )
 
-        // Bottom controls
-        BottomControls(
-            isRecording = state.isRecording,
-            onToggleRecording = {
-                if (state.isRecording) {
-                    ctx.startService(Intent(ctx, RecordingService::class.java).apply {
-                        action = RecordingService.ACTION_STOP
-                    })
-                } else {
-                    RecordingService.startWith(ctx, lensFacing = state.lensFacing)
-                }
-            },
-            onSwitchCamera = viewModel::toggleLens,
-            onRotate = viewModel::toggleRotationLock,
-            rotationLocked = state.rotationLocked,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(bottom = 24.dp)
-        )
-
-        // Top REC indicator
+        // ============ Top REC indicator ============
         if (state.isRecording) {
             RecIndicator(
                 durationSec = state.durationSec,
@@ -108,31 +122,39 @@ fun CameraScreen(
                     .padding(16.dp)
             )
         }
-    }
-}
 
-@Composable
-private fun CameraPreviewPlaceholder() {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A1A1F),
-                        Color(0xFF0B0B0F)
-                    )
-                )
+        // ============ Last event indicator (top center) ============
+        if (state.lastEventLabel != null) {
+            EventIndicator(
+                label = state.lastEventLabel!!,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 16.dp)
             )
-    ) {
-        // Centered camera icon — would be replaced by real PreviewView in production
-        Icon(
-            Icons.Filled.Videocam,
-            contentDescription = null,
-            tint = Color.White.copy(alpha = 0.1f),
+        }
+
+        // ============ Error message ============
+        if (state.error != null) {
+            ErrorBanner(
+                message = state.error!!,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 110.dp)
+            )
+        }
+
+        // ============ Bottom controls ============
+        BottomControls(
+            isRecording = state.isRecording,
+            isCameraBound = state.isCameraBound,
+            onToggleRecording = viewModel::toggleRecording,
+            onSwitchCamera = viewModel::toggleLens,
+            onRotate = viewModel::toggleRotationLock,
+            rotationLocked = state.rotationLocked,
             modifier = Modifier
-                .align(Alignment.Center)
-                .size(120.dp)
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
         )
     }
 }
@@ -145,11 +167,9 @@ private fun HudOverlay(
 ) {
     Box(modifier) {
         if (isLandscape) {
-            // Landscape: HUD on right side as vertical stack
             LandscapeHud(state, Modifier.align(Alignment.CenterEnd).padding(16.dp))
         } else {
-            // Portrait: HUD on top (speed) and bottom (distance + GPS + G-force)
-            PortraitHud(state, Modifier.align(Alignment.TopEnd).padding(16.dp))
+            PortraitHud(state, Modifier.align(Alignment.TopEnd).padding(top = 60.dp, end = 16.dp))
         }
     }
 }
@@ -157,16 +177,12 @@ private fun HudOverlay(
 @Composable
 private fun PortraitHud(state: CameraUiState, modifier: Modifier = Modifier) {
     Column(modifier, horizontalAlignment = Alignment.End) {
-        // Speed
         HudSpeedCard(speedKmh = state.speedKmh, unit = state.speedUnit)
         Spacer(Modifier.height(12.dp))
-        // Distance
         HudSmallCard(label = "DIST", value = Formatters.distance(state.distanceMeters))
         Spacer(Modifier.height(8.dp))
-        // G-force
         HudGForceCard(gForce = state.gForce)
         Spacer(Modifier.height(8.dp))
-        // GPS
         HudGpsCard(lat = state.lat, lon = state.lon)
     }
 }
@@ -190,16 +206,16 @@ private fun HudSpeedCard(speedKmh: Float, unit: String, compact: Boolean = false
     Column(
         Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black.copy(alpha = 0.55f))
+            .background(Color.Black.copy(alpha = 0.6f))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = Formatters.speed(speedKmh / 3.6f, factor = if (unit == "km/h") 3.6f else 2.23694f),
+            text = "%.0f".format(speedKmh),
             color = if (speedKmh > 120) HudRed else HudGreen,
             fontSize = if (compact) 36.sp else 48.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+            fontFamily = FontFamily.Monospace
         )
         Text(unit, color = HudDim, fontSize = 11.sp, letterSpacing = 2.sp)
     }
@@ -210,7 +226,7 @@ private fun HudSmallCard(label: String, value: String) {
     Column(
         Modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.Black.copy(alpha = 0.55f))
+            .background(Color.Black.copy(alpha = 0.6f))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -229,7 +245,7 @@ private fun HudGForceCard(gForce: Float, compact: Boolean = false) {
     Column(
         Modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.Black.copy(alpha = 0.55f))
+            .background(Color.Black.copy(alpha = 0.6f))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -239,18 +255,18 @@ private fun HudGForceCard(gForce: Float, compact: Boolean = false) {
             color = color,
             fontSize = if (compact) 14.sp else 18.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+            fontFamily = FontFamily.Monospace
         )
     }
 }
 
 @Composable
 private fun HudGpsCard(lat: Double?, lon: Double?, compact: Boolean = false) {
-    val text = if (lat != null && lon != null) Formatters.coordinates(lat, lon) else "—"
+    val text = if (lat != null && lon != null) Formatters.coordinates(lat, lon) else "SIN SEÑAL"
     Column(
         Modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.Black.copy(alpha = 0.55f))
+            .background(Color.Black.copy(alpha = 0.6f))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -259,7 +275,7 @@ private fun HudGpsCard(lat: Double?, lon: Double?, compact: Boolean = false) {
             text,
             color = HudWhite,
             fontSize = if (compact) 11.sp else 13.sp,
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+            fontFamily = FontFamily.Monospace
         )
     }
 }
@@ -269,10 +285,11 @@ private fun RecIndicator(durationSec: Long, modifier: Modifier = Modifier) {
     Row(
         modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.Black.copy(alpha = 0.6f))
+            .background(Color.Black.copy(alpha = 0.7f))
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Pulsing dot
         Box(Modifier.size(10.dp).clip(CircleShape).background(HudRed))
         Spacer(Modifier.width(8.dp))
         Text(
@@ -285,8 +302,34 @@ private fun RecIndicator(durationSec: Long, modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun EventIndicator(label: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(HudRed.copy(alpha = 0.85f))
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+    }
+}
+
+@Composable
+private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(HudRed.copy(alpha = 0.9f))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(message, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
 private fun BottomControls(
     isRecording: Boolean,
+    isCameraBound: Boolean,
     onToggleRecording: () -> Unit,
     onSwitchCamera: () -> Unit,
     onRotate: () -> Unit,
@@ -298,41 +341,33 @@ private fun BottomControls(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Switch camera
+        // Switch camera (disabled while recording)
         ControlButton(
             icon = Icons.Filled.Cameraswitch,
             contentDesc = "Cambiar cámara",
             onClick = onSwitchCamera,
-            tint = HudWhite
+            tint = if (isRecording) HudDim else HudWhite,
+            enabled = !isRecording
         )
         Spacer(Modifier.width(24.dp))
 
-        // Main record/stop button
+        // Main record/stop button — clickable directly on the parent
         Box(
             Modifier
-                .size(72.dp)
+                .size(76.dp)
                 .clip(CircleShape)
                 .background(if (isRecording) HudRed else Primary)
-                .padding(0.dp),
+                .clickable(enabled = isCameraBound) { onToggleRecording() },
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 if (isRecording) Icons.Filled.Stop else Icons.Filled.Videocam,
                 contentDescription = if (isRecording) "Detener grabación" else "Iniciar grabación",
                 tint = Color.Black,
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .padding(0.dp)
-            )
-            // clickable overlay
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape)
-                    .clickable(onClick = onToggleRecording)
+                modifier = Modifier.size(36.dp)
             )
         }
+
         Spacer(Modifier.width(24.dp))
 
         // Rotate
@@ -350,16 +385,22 @@ private fun ControlButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     contentDesc: String,
     onClick: () -> Unit,
-    tint: Color
+    tint: Color,
+    enabled: Boolean = true
 ) {
     Box(
         Modifier
             .size(48.dp)
             .clip(CircleShape)
-            .background(Color.Black.copy(alpha = 0.5f))
-            .clickable(onClick = onClick),
+            .background(Color.Black.copy(alpha = 0.55f))
+            .clickable(enabled = enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Icon(icon, contentDescription = contentDesc, tint = tint, modifier = Modifier.size(24.dp))
+        Icon(
+            icon,
+            contentDescription = contentDesc,
+            tint = tint,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
