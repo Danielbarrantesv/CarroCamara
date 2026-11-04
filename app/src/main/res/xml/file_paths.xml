@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- App-specific external storage (videos, reports) -->
+    <external-files-path
+        name="videos"
+        path="videos/" />
+    <external-files-path
+        name="reports"
+        path="reports/" />
+    <external-files-path
+        name="photos"
+        path="photos/" />
+    <external-files-path
+        name="exports"
+        path="exports/" />
+
+    <!-- Cache -->
+    <external-cache-path
+        name="cache"
+        path="." />
+
+    <cache-path
+        name="internal_cache"
+        path="." />
+
+    <!-- Internal storage -->
+    <files-path
+        name="files"
+        path="." />
+</paths>

@@ -1,0 +1,397 @@
+package com.danielbarrantesv.dashcam.ui.onboarding
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
+import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
+import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
+import com.danielbarrantesv.dashcam.ui.theme.DashCamTypography
+import com.danielbarrantesv.dashcam.ui.theme.HudAmber
+import com.danielbarrantesv.dashcam.ui.theme.HudGreen
+import com.danielbarrantesv.dashcam.ui.theme.Primary
+import com.danielbarrantesv.dashcam.ui.theme.Success
+import com.danielbarrantesv.dashcam.util.Permissions
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+
+/**
+ * Three-step onboarding:
+ *   1. Welcome
+ *   2. Storage configuration (configurable default 5 GB)
+ *   3. Permissions (camera, mic, location, background location, notifications)
+ */
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun OnboardingFlow(onFinish: () -> Unit) {
+    val context = LocalContext.current
+    var step by remember { mutableIntStateOf(0) }
+
+    // Permissions state
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Permissions.camera,
+            Permissions.recordAudio,
+            Permissions.fineLocation,
+            Permissions.coarseLocation,
+            Permissions.postNotifications
+        )
+    )
+
+    // Storage config
+    var storageGb by remember { mutableFloatStateOf(5f) }
+    var quality by remember { mutableStateOf(VideoQuality.FHD) }
+    var unit by remember { mutableStateOf(SpeedUnit.KMH) }
+
+    // Background location (must be requested after foreground location)
+    val bgLocationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ -> /* regardless, continue */ }
+
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        when (step) {
+            0 -> WelcomeStep(onContinue = { step = 1 })
+            1 -> StorageStep(
+                storageGb = storageGb,
+                onStorageChange = { storageGb = it },
+                quality = quality,
+                onQualityChange = { quality = it },
+                unit = unit,
+                onUnitChange = { unit = it },
+                onContinue = { step = 2 }
+            )
+            2 -> PermissionsStep(
+                permissionsState = permissionsState,
+                onBackgroundLocationRequest = {
+                    bgLocationLauncher.launch(Permissions.backgroundLocation)
+                },
+                onContinue = {
+                    // Persist settings before finishing
+                    val prefs = SettingsRepository(context)
+                    val storageFinalGb = storageGb.toInt()
+                    val qualityFinal = quality
+                    val unitFinal = unit
+                    MainScope().launch {
+                        prefs.setStorageLimitGb(storageFinalGb)
+                        prefs.setVideoQuality(qualityFinal)
+                        prefs.setSpeedUnit(unitFinal)
+                        prefs.setOnboardingComplete()
+                        onFinish()
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun WelcomeStep(onContinue: () -> Unit) {
+    Column(
+        Modifier.fillMaxSize().padding(32.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(Modifier.height(64.dp))
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                Modifier.size(120.dp).clip(CircleShape).background(Primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Filled.PhotoCamera,
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.size(64.dp)
+                )
+            }
+            Spacer(Modifier.height(32.dp))
+            Text(
+                text = "DashCam",
+                style = DashCamTypography.displayMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Tu testigo de camino",
+                style = DashCamTypography.titleMedium,
+                color = Primary
+            )
+            Spacer(Modifier.height(32.dp))
+            Text(
+                text = "Convierte tu teléfono en una dashcam profesional. Grabación en bucle, telemetría GPS y reportes para tu aseguradora.",
+                style = DashCamTypography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
+
+        Button(
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+        ) {
+            Text("Comenzar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
+        }
+    }
+}
+
+@Composable
+private fun StorageStep(
+    storageGb: Float,
+    onStorageChange: (Float) -> Unit,
+    quality: VideoQuality,
+    onQualityChange: (VideoQuality) -> Unit,
+    unit: SpeedUnit,
+    onUnitChange: (SpeedUnit) -> Unit,
+    onContinue: () -> Unit
+) {
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text("Configura tu almacenamiento", style = DashCamTypography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Indica cuánto espacio en disco destinar a los videos. Cuando se llene, los más antiguos se borrarán automáticamente.",
+                style = DashCamTypography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(32.dp))
+
+            // Storage slider
+            Text("${storageGb.toInt()} GB", style = DashCamTypography.displayMedium, color = Primary)
+            Text(
+                "≈ ${"%.0f".format(storageGb * 12)} min de video en 1080p",
+                style = DashCamTypography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Slider(
+                value = storageGb,
+                onValueChange = onStorageChange,
+                valueRange = 1f..30f,
+                steps = 28
+            )
+
+            Spacer(Modifier.height(32.dp))
+
+            // Video quality
+            Text("Calidad de video", style = DashCamTypography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(8.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                VideoQuality.entries.forEach { q ->
+                    QualityChip(
+                        label = q.label,
+                        selected = quality == q,
+                        onClick = { onQualityChange(q) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            // Speed unit
+            Text("Unidad de velocidad", style = DashCamTypography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(8.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SpeedUnit.entries.forEach { u ->
+                    QualityChip(
+                        label = u.label,
+                        selected = unit == u,
+                        onClick = { onUnitChange(u) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        Button(
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+        ) {
+            Text("Continuar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
+        }
+    }
+}
+
+@Composable
+private fun QualityChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected) Primary else MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = if (selected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    ) { Text(label, fontWeight = FontWeight.SemiBold) }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun PermissionsStep(
+    permissionsState: com.google.accompanist.permissions.MultiplePermissionsState,
+    onBackgroundLocationRequest: () -> Unit,
+    onContinue: () -> Unit
+) {
+    val context = LocalContext.current
+
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text("Permisos necesarios", style = DashCamTypography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "DashCam necesita varios permisos para funcionar correctamente en segundo plano.",
+                style = DashCamTypography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(24.dp))
+
+            val items = buildList {
+                add(PermItem(Icons.Filled.PhotoCamera, "Cámara", "Para grabar video", Permissions.isCameraGranted(context)))
+                add(PermItem(Icons.Filled.Mic, "Micrófono", "Audio opcional", Permissions.isAudioGranted(context)))
+                add(PermItem(Icons.Filled.LocationOn, "Ubicación", "Velocidad, ruta GPS, kilometraje", Permissions.isLocationGranted(context)))
+                add(PermItem(Icons.Filled.LocationOn, "Ubicación en segundo plano", "GPS mientras la app está minimizada", Permissions.isBackgroundLocationGranted(context)))
+                add(PermItem(Icons.Filled.Notifications, "Notificaciones", "Control de grabación y alertas", Permissions.isNotificationsGranted(context)))
+            }
+
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(items) { item ->
+                    PermissionCard(item)
+                }
+            }
+        }
+
+        Column {
+            Button(
+                onClick = { permissionsState.launchMultiplePermissionRequest() },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Primary)
+            ) {
+                Text("Conceder permisos", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            }
+            Spacer(Modifier.height(12.dp))
+
+            Text(
+                "Para ubicación en segundo plano, después de conceder ubicación, debes solicitarla por separado.",
+                style = DashCamTypography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(8.dp))
+            Button(
+                onClick = onBackgroundLocationRequest,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) { Text("Solicitar ubicación en segundo plano") }
+
+            Spacer(Modifier.height(16.dp))
+
+            Button(
+                onClick = onContinue,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Primary)
+            ) {
+                Text("Comenzar a grabar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }
+}
+
+private data class PermItem(val icon: androidx.compose.ui.graphics.vector.ImageVector, val title: String, val desc: String, val granted: Boolean)
+
+@Composable
+private fun PermissionCard(item: PermItem) {
+    Card(
+        Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(item.icon, contentDescription = null, tint = Primary, modifier = Modifier.size(28.dp))
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Text(item.title, style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+                Text(item.desc, style = DashCamTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Spacer(Modifier.width(8.dp))
+            if (item.granted) {
+                Icon(Icons.Filled.Check, contentDescription = null, tint = Success, modifier = Modifier.size(24.dp))
+            } else {
+                Box(
+                    Modifier.size(12.dp).clip(CircleShape).background(HudAmber)
+                )
+            }
+        }
+    }
+}

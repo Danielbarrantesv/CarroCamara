@@ -1,0 +1,26 @@
+<resources>
+    <!-- DashCam brand palette (dark theme primary) -->
+    <color name="app_background">#FF0B0B0F</color>
+    <color name="app_surface">#FF16161D</color>
+    <color name="app_surface_variant">#FF23232C</color>
+    <color name="app_on_surface">#FFEAEAF0</color>
+    <color name="app_on_surface_variant">#FFB0B0BB</color>
+
+    <color name="brand_primary">#FFFF6A00</color>      <!-- naranja dashcam -->
+    <color name="brand_primary_container">#FF5A2A00</color>
+    <color name="brand_on_primary">#FF000000</color>
+    <color name="brand_secondary">#FFFF3B30</color>    <!-- rojo alerta -->
+    <color name="brand_secondary_container">#FF4A0E0A</color>
+    <color name="brand_on_secondary">#FFFFFFFF</color>
+
+    <color name="accent_success">#FF34C759</color>
+    <color name="accent_warning">#FFFFCC00</color>
+    <color name="accent_danger">#FFFF453A</color>
+
+    <!-- App icon (adaptive) -->
+    <color name="ic_launcher_background">#FF0B0B0F</color>
+    <color name="ic_launcher_foreground">#FFFF6A00</color>
+
+    <!-- Splash -->
+    <color name="splash_background">#FF0B0B0F</color>
+</resources>

@@ -6,6 +6,26 @@ node_modules/
 .env.local
 .env.*.local
 
+# Android Studio / Gradle
+local.properties
+*.iml
+.gradle/
+build/
+.idea/
+.cxx/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystore (do not commit signing keys)
+*.jks
+*.keystore
+
+# Logs
+*.log
+
 # OS / editor
 .DS_Store
 Thumbs.db

@@ -1,0 +1,244 @@
+package com.danielbarrantesv.dashcam.ui.settings
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
+import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
+import com.danielbarrantesv.dashcam.ui.theme.DashCamTypography
+import com.danielbarrantesv.dashcam.ui.theme.Primary
+
+@Composable
+fun SettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LazyColumn(
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            SectionHeader("Grabación")
+            SettingsCard {
+                ToggleRow(
+                    title = "Grabar audio",
+                    subtitle = "Micrófono durante la grabación",
+                    checked = state.audioEnabled,
+                    onCheckedChange = viewModel::setAudio
+                )
+                DividerLine()
+                QualityRow(
+                    title = "Calidad de video",
+                    subtitle = state.videoQuality.label,
+                    options = VideoQuality.entries.map { it.label to it },
+                    selected = state.videoQuality,
+                    onSelect = viewModel::setVideoQuality
+                )
+                DividerLine()
+                SliderRow(
+                    title = "Duración del segmento",
+                    valueText = "${state.segmentDurationSec}s",
+                    value = state.segmentDurationSec.toFloat(),
+                    range = 15f..300f,
+                    steps = 56,
+                    onValueChange = { viewModel.setSegmentDuration(it.toInt()) }
+                )
+            }
+        }
+
+        item {
+            SectionHeader("Almacenamiento")
+            SettingsCard {
+                SliderRow(
+                    title = "Límite de almacenamiento",
+                    valueText = "${state.storageLimitGb} GB",
+                    value = state.storageLimitGb.toFloat(),
+                    range = 1f..30f,
+                    steps = 28,
+                    onValueChange = { viewModel.setStorageGb(it.toInt()) }
+                )
+            }
+        }
+
+        item {
+            SectionHeader("Sensores")
+            SettingsCard {
+                SliderRow(
+                    title = "Umbral de fuerza G",
+                    valueText = "${"%.2f".format(state.gforceThreshold)} g",
+                    value = state.gforceThreshold,
+                    range = 0.2f..3.0f,
+                    steps = 27,
+                    onValueChange = viewModel::setGforceThreshold
+                )
+                DividerLine()
+                QualityRow(
+                    title = "Unidad de velocidad",
+                    subtitle = state.speedUnit.label,
+                    options = SpeedUnit.entries.map { it.label to it },
+                    selected = state.speedUnit,
+                    onSelect = viewModel::setSpeedUnit
+                )
+            }
+        }
+
+        item {
+            SectionHeader("Otros")
+            SettingsCard {
+                ToggleRow(
+                    title = "Iniciar al conectar cargador",
+                    subtitle = "Arranca la grabación automáticamente",
+                    checked = state.autoStartOnPower,
+                    onCheckedChange = viewModel::setAutoStart
+                )
+                DividerLine()
+                ToggleRow(
+                    title = "Mantener pantalla encendida",
+                    subtitle = "Evita que se apague mientras grabas",
+                    checked = state.keepScreenOn,
+                    onCheckedChange = viewModel::setKeepScreenOn
+                )
+            }
+        }
+
+        item {
+            SectionHeader("Acerca de")
+            SettingsCard {
+                InfoRow("Versión", "1.0.0")
+                DividerLine()
+                InfoRow("Autor", "Daniel Barrantes")
+                DividerLine()
+                InfoRow("Repositorio", "github.com/Danielbarrantesv/CarroCamara")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(text: String) {
+    Text(
+        text,
+        style = DashCamTypography.titleSmall,
+        color = Primary,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(start = 4.dp, top = 8.dp, bottom = 4.dp)
+    )
+}
+
+@Composable
+private fun SettingsCard(content: @Composable () -> Unit) {
+    Card(
+        Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(Modifier.padding(8.dp)) { content() }
+    }
+}
+
+@Composable
+private fun ToggleRow(title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(title, style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+            Text(subtitle, style = DashCamTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(Modifier.width(8.dp))
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
+
+@Composable
+private fun <T> QualityRow(
+    title: String,
+    subtitle: String,
+    options: List<Pair<String, T>>,
+    selected: T,
+    onSelect: (T) -> Unit
+) {
+    Column(Modifier.padding(12.dp)) {
+        Text(title, style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(subtitle, style = DashCamTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            options.forEach { (label, value) ->
+                val isSelected = value == selected
+                androidx.compose.material3.Button(
+                    onClick = { onSelect(value) },
+                    modifier = Modifier.weight(1f).height(40.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = if (isSelected) Primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isSelected) androidx.compose.ui.graphics.Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                ) { Text(label, fontWeight = FontWeight.SemiBold, style = DashCamTypography.labelMedium) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SliderRow(
+    title: String,
+    valueText: String,
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+    steps: Int,
+    onValueChange: (Float) -> Unit
+) {
+    Column(Modifier.padding(12.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(title, style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+            Text(valueText, style = DashCamTypography.titleSmall, color = Primary, fontWeight = FontWeight.Bold)
+        }
+        Slider(value = value, onValueChange = onValueChange, valueRange = range, steps = steps)
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        Modifier.fillMaxWidth().padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, style = DashCamTypography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+        Text(value, style = DashCamTypography.bodyMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun DividerLine() {
+    androidx.compose.material3.HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 12.dp),
+        thickness = 0.5.dp,
+        color = MaterialTheme.colorScheme.outlineVariant
+    )
+}

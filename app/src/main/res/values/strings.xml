@@ -1,0 +1,156 @@
+<resources>
+    <!-- App identity -->
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">Tu testigo de camino</string>
+
+    <!-- Permissions rationale -->
+    <string name="perm_camera_title">Cámara</string>
+    <string name="perm_camera_rationale">DashCam necesita la cámara para grabar video mientras conduces.</string>
+    <string name="perm_audio_title">Micrófono</string>
+    <string name="perm_audio_rationale">Permite grabar audio dentro del vehículo (opcional, configurable).</string>
+    <string name="perm_location_title">Ubicación</string>
+    <string name="perm_location_rationale">Permite registrar velocidad, ruta GPS y kilometraje en los reportes.</string>
+    <string name="perm_location_background_title">Ubicación en segundo plano</string>
+    <string name="perm_location_background_rationale">Necesario para que la grabación continúe con datos GPS cuando la app pasa a segundo plano.</string>
+    <string name="perm_notifications_title">Notificaciones</string>
+    <string name="perm_notifications_rationale">Permite mostrar el control de grabación en segundo plano y alertas de impacto.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Bienvenido a DashCam</string>
+    <string name="onboarding_welcome_body">Convierte tu teléfono en una dashcam profesional. Grabación en bucle, telemetría GPS y reportes para tu aseguradora.</string>
+    <string name="onboarding_storage_title">Configura tu almacenamiento</string>
+    <string name="onboarding_storage_body">Indica cuánto espacio en disco destinar a los videos. Cuando se llene, los más antiguos se borrarán automáticamente.</string>
+    <string name="onboarding_storage_unit">GB</string>
+    <string name="onboarding_permissions_title">Permisos necesarios</string>
+    <string name="onboarding_permissions_body">DashCam necesita varios permisos para funcionar correctamente en segundo plano.</string>
+    <string name="onboarding_start">Comenzar a grabar</string>
+    <string name="onboarding_continue">Continuar</string>
+    <string name="onboarding_skip">Saltar</string>
+
+    <!-- Camera / Recording -->
+    <string name="rec_start">Iniciar grabación</string>
+    <string name="rec_stop">Detener grabación</string>
+    <string name="rec_recording">Grabando</string>
+    <string name="rec_paused">Pausado</string>
+    <string name="rec_stopped">Detenido</string>
+    <string name="rec_capture_photo">Capturar foto</string>
+    <string name="rec_emergency_save">Guardar evento</string>
+    <string name="rec_rotate">Rotar cámara</string>
+    <string name="rec_switch_camera">Cambiar cámara</string>
+    <string name="rec_duration">Duración</string>
+    <string name="rec_segment">Segmento actual</string>
+    <string name="rec_storage_used">Almacenamiento usado</string>
+
+    <!-- HUD labels -->
+    <string name="hud_speed">Velocidad</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">Distancia</string>
+    <string name="hud_distance_unit">km</string>
+    <string name="hud_gforce">Fuerza G</string>
+    <string name="hud_coordinates">Coordenadas</string>
+    <string name="hud_altitude">Altitud</string>
+    <string name="hud_altitude_unit">m</string>
+    <string name="hud_heading">Rumbo</string>
+    <string name="hud_no_gps">Sin señal GPS</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_camera">Cámara</string>
+    <string name="nav_trips">Viajes</string>
+    <string name="nav_reports">Reportes</string>
+    <string name="nav_transfer">Transferir</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Trips -->
+    <string name="trips_title">Viajes grabados</string>
+    <string name="trips_empty">Aún no hay viajes grabados.</string>
+    <string name="trips_distance">Distancia</string>
+    <string name="trips_duration">Duración</string>
+    <string name="trips_max_speed">Vel. máxima</string>
+    <string name="trips_avg_speed">Vel. promedio</string>
+    <string name="trips_events">Eventos</string>
+    <string name="trips_delete">Eliminar viaje</string>
+    <string name="trips_export_report">Generar reporte PDF</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Reportes para aseguradora</string>
+    <string name="reports_empty">Aún no has generado reportes.</string>
+    <string name="reports_generate">Generar reporte</string>
+    <string name="reports_share">Compartir</string>
+    <string name="reports_open">Abrir</string>
+    <string name="reports_delete">Eliminar</string>
+    <string name="reports_generating">Generando reporte PDF…</string>
+    <string name="report_field_policy_holder">Titular de la póliza</string>
+    <string name="report_field_policy_number">No. de póliza</string>
+    <string name="report_field_vehicle_plate">Placa del vehículo</string>
+    <string name="report_field_incident_date">Fecha del incidente</string>
+    <string name="report_field_incident_time">Hora del incidente</string>
+    <string name="report_field_location">Ubicación</string>
+    <string name="report_field_speed">Velocidad al momento del impacto</string>
+    <string name="report_field_gforce">Fuerzas G registradas</string>
+    <string name="report_field_summary">Resumen del trayecto</string>
+    <string name="report_field_event_log">Registro de eventos</string>
+
+    <!-- Transfer -->
+    <string name="transfer_title">Transferencia WiFi</string>
+    <string name="transfer_start_server">Iniciar servidor</string>
+    <string name="transfer_stop_server">Detener servidor</string>
+    <string name="transfer_server_running">Servidor activo en:</string>
+    <string name="transfer_server_stopped">Servidor detenido</string>
+    <string name="transfer_qr">Escanea para abrir en otro dispositivo</string>
+    <string name="transfer_open_browser">Abrir en navegador</string>
+    <string name="transfer_videos">Videos disponibles</string>
+    <string name="transfer_reports">Reportes disponibles</string>
+    <string name="transfer_no_wifi">Conéctate a una red WiFi para usar esta función.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_section_recording">Grabación</string>
+    <string name="settings_section_storage">Almacenamiento</string>
+    <string name="settings_section_sensors">Sensores</string>
+    <string name="settings_section_about">Acerca de</string>
+    <string name="settings_video_quality">Calidad de video</string>
+    <string name="settings_segment_duration">Duración del segmento</string>
+    <string name="settings_storage_limit">Límite de almacenamiento</string>
+    <string name="settings_audio_enabled">Grabar audio</string>
+    <string name="settings_gforce_threshold">Umbral de fuerza G (g)</string>
+    <string name="settings_speed_unit">Unidad de velocidad</string>
+    <string name="settings_auto_start">Iniciar al conectar cargador</string>
+    <string name="settings_keep_screen_on">Mantener pantalla encendida</string>
+    <string name="settings_about_version">Versión</string>
+    <string name="settings_about_author">Autor</string>
+    <string name="settings_about_repo">Repositorio</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_recording">Grabación en curso</string>
+    <string name="notif_channel_recording_desc">Notificación persistente mientras DashCam graba en segundo plano.</string>
+    <string name="notif_channel_events">Eventos de impacto</string>
+    <string name="notif_channel_events_desc">Alertas cuando se detecta una fuerza G elevada.</string>
+    <string name="notif_channel_transfer">Transferencia WiFi</string>
+    <string name="notif_channel_transfer_desc">Notificación del servidor HTTP local activo.</string>
+    <string name="notif_recording_title">DashCam grabando</string>
+    <string name="notif_recording_text">Toca para volver a la cámara</string>
+    <string name="notif_event_title">Impacto detectado</string>
+    <string name="notif_event_text">Fuerza G: %1$.2f g — Evento guardado</string>
+    <string name="notif_server_title">Servidor DashCam activo</string>
+    <string name="notif_server_text">Disponible en %1$s</string>
+
+    <!-- Errors -->
+    <string name="error_camera_unavailable">No se pudo acceder a la cámara.</string>
+    <string name="error_storage_full">Almacenamiento lleno. Libera espacio o ajusta el límite en Ajustes.</string>
+    <string name="error_gps_unavailable">GPS no disponible. Verifica que esté activado.</string>
+    <string name="error_report_generation">No se pudo generar el reporte PDF.</string>
+    <string name="error_server_start">No se pudo iniciar el servidor. Verifica el WiFi.</string>
+
+    <!-- Common -->
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_back">Volver</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_grant">Conceder</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_open_settings">Abrir ajustes</string>
+    <string name="content_desc_record">Botón de grabación</string>
+    <string name="content_desc_photo">Botón de captura de foto</string>
+    <string name="content_desc_rotate">Rotar pantalla</string>
+    <string name="content_desc_switch">Cambiar cámara</string>
+</resources>
