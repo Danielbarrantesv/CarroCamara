@@ -13,6 +13,70 @@
     <string name="onboarding_continue">Weiter</string>
     <string name="onboarding_skip">Überspringen</string>
 
+    <string name="onboarding_language_title">Wähle deine Sprache</string>
+    <string name="onboarding_language_subtitle">App-Sprache wählen</string>
+    <string name="onboarding_language_continue">Weiter</string>
+    <string name="onboarding_folder_title">Video-Ordner</string>
+    <string name="onboarding_folder_body">Wähle, wo die aufgezeichneten Videos gespeichert werden sollen. Du kannst den App-Speicher verwenden oder einen benutzerdefinierten Ordner wählen (empfohlen: ein Ordner im internen Speicher oder einer SD-Karte).</string>
+    <string name="onboarding_folder_custom">Benutzerdefinierter Ordner</string>
+    <string name="onboarding_folder_default">Standardordner</string>
+    <string name="onboarding_folder_default_desc">App-Speicher (nicht von anderen Apps zugänglich)</string>
+    <string name="onboarding_folder_pick">Ordner wählen</string>
+    <string name="onboarding_folder_use_default">Standard verwenden</string>
+
+    <string name="onboarding_welcome_app_name">DashCam</string>
+    <string name="onboarding_welcome_tagline">Dein Straßenzeuge</string>
+    <string name="onboarding_welcome_button">Starten</string>
+
+    <string name="onboarding_perm_camera_title">Kamera</string>
+    <string name="onboarding_perm_camera_desc">Um Video aufzunehmen</string>
+    <string name="onboarding_perm_mic_title">Mikrofon</string>
+    <string name="onboarding_perm_mic_desc">Optionales Audio</string>
+    <string name="onboarding_perm_location_title">Standort</string>
+    <string name="onboarding_perm_location_desc">Geschwindigkeit, GPS-Route, Kilometerstand</string>
+    <string name="onboarding_perm_bg_location_title">Hintergrundstandort</string>
+    <string name="onboarding_perm_bg_location_desc">GPS wenn die App minimiert ist</string>
+    <string name="onboarding_perm_notifications_title">Benachrichtigungen</string>
+    <string name="onboarding_perm_notifications_desc">Aufnahmekontrolle und Warnungen</string>
+    <string name="onboarding_perm_grant_button">Berechtigungen gewähren</string>
+    <string name="onboarding_perm_bg_location_button">Hintergrundstandort anfordern</string>
+
+    <string name="settings_section_camera">Kamera</string>
+    <string name="settings_section_others">Andere</string>
+    <string name="settings_section_permissions">Berechtigungen</string>
+    <string name="settings_section_language">Sprache</string>
+
+    <string name="settings_default_lens">Standardkamera</string>
+    <string name="settings_default_lens_back">Hinten</string>
+    <string name="settings_default_lens_front">Vorne</string>
+    <string name="settings_dual_camera">Doppelkamera</string>
+    <string name="settings_dual_camera_desc">Gleichzeitig mit Front- und Rückkamera aufnehmen (bald verfügbar)</string>
+
+    <string name="settings_videos_folder">Video-Ordner</string>
+    <string name="settings_change_location">Speicherort ändern</string>
+    <string name="settings_reset">Zurücksetzen</string>
+
+    <string name="settings_auto_start_desc">Startet die Aufnahme automatisch</string>
+    <string name="settings_keep_screen_on_desc">Bildschirm während der Aufnahme an lassen</string>
+    <string name="settings_audio_desc">Mikrofon während der Aufnahme</string>
+
+    <string name="settings_language_title">App-Sprache</string>
+    <string name="settings_language_desc">Sprache ändern. Wird sofort angewendet.</string>
+
+    <string name="perm_camera_title">Kamera</string>
+    <string name="perm_camera_desc">Erforderlich für Videoaufnahme</string>
+    <string name="perm_mic_title">Mikrofon</string>
+    <string name="perm_mic_desc">Audio in Videos (optional)</string>
+    <string name="perm_location_title">Standort</string>
+    <string name="perm_location_desc">GPS, Geschwindigkeit und Route</string>
+    <string name="perm_bg_location_title">Hintergrundstandort</string>
+    <string name="perm_bg_location_desc">GPS wenn die App minimiert ist</string>
+    <string name="perm_notifications_title">Benachrichtigungen</string>
+    <string name="perm_notifications_desc">Aufnahme- und Aufprall-Warnungen</string>
+    <string name="perm_grant">Gewähren</string>
+    <string name="perm_open_settings">Einstellungen</string>
+    <string name="perm_granted">Gewährt</string>
+
     <string name="rec_start">Aufnahme starten</string>
     <string name="rec_stop">Aufnahme stoppen</string>
     <string name="rec_recording">Aufnahme</string>

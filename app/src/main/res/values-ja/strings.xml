@@ -13,6 +13,70 @@
     <string name="onboarding_continue">続ける</string>
     <string name="onboarding_skip">スキップ</string>
 
+    <string name="onboarding_language_title">言語を選択</string>
+    <string name="onboarding_language_subtitle">アプリの言語を選択</string>
+    <string name="onboarding_language_continue">続ける</string>
+    <string name="onboarding_folder_title">動画フォルダ</string>
+    <string name="onboarding_folder_body">録画した動画を保存する場所を選択します。アプリストレージを使用するか、カスタムフォルダを選択できます（推奨：内部ストレージまたはSDカードのフォルダ）。</string>
+    <string name="onboarding_folder_custom">カスタムフォルダ</string>
+    <string name="onboarding_folder_default">デフォルトフォルダ</string>
+    <string name="onboarding_folder_default_desc">アプリストレージ（他のアプリからアクセス不可）</string>
+    <string name="onboarding_folder_pick">フォルダを選択</string>
+    <string name="onboarding_folder_use_default">デフォルトを使用</string>
+
+    <string name="onboarding_welcome_app_name">DashCam</string>
+    <string name="onboarding_welcome_tagline">あなたの運転の証人</string>
+    <string name="onboarding_welcome_button">開始</string>
+
+    <string name="onboarding_perm_camera_title">カメラ</string>
+    <string name="onboarding_perm_camera_desc">動画を録画するため</string>
+    <string name="onboarding_perm_mic_title">マイク</string>
+    <string name="onboarding_perm_mic_desc">オプションの音声</string>
+    <string name="onboarding_perm_location_title">位置情報</string>
+    <string name="onboarding_perm_location_desc">速度、GPSルート、走行距離</string>
+    <string name="onboarding_perm_bg_location_title">バックグラウンド位置情報</string>
+    <string name="onboarding_perm_bg_location_desc">アプリ最小化時のGPS</string>
+    <string name="onboarding_perm_notifications_title">通知</string>
+    <string name="onboarding_perm_notifications_desc">録画制御とアラート</string>
+    <string name="onboarding_perm_grant_button">権限を付与</string>
+    <string name="onboarding_perm_bg_location_button">バックグラウンド位置情報を要求</string>
+
+    <string name="settings_section_camera">カメラ</string>
+    <string name="settings_section_others">その他</string>
+    <string name="settings_section_permissions">権限</string>
+    <string name="settings_section_language">言語</string>
+
+    <string name="settings_default_lens">デフォルトカメラ</string>
+    <string name="settings_default_lens_back">背面</string>
+    <string name="settings_default_lens_front">前面</string>
+    <string name="settings_dual_camera">デュアルカメラ</string>
+    <string name="settings_dual_camera_desc">前面と背面カメラで同時に録画（近日対応）</string>
+
+    <string name="settings_videos_folder">動画フォルダ</string>
+    <string name="settings_change_location">場所を変更</string>
+    <string name="settings_reset">リセット</string>
+
+    <string name="settings_auto_start_desc">自動的に録画を開始</string>
+    <string name="settings_keep_screen_on_desc">録画中は画面をオンのまま</string>
+    <string name="settings_audio_desc">録画中のマイク</string>
+
+    <string name="settings_language_title">アプリ言語</string>
+    <string name="settings_language_desc">言語を変更。即座に適用されます。</string>
+
+    <string name="perm_camera_title">カメラ</string>
+    <string name="perm_camera_desc">動画録画に必要</string>
+    <string name="perm_mic_title">マイク</string>
+    <string name="perm_mic_desc">動画の音声（オプション）</string>
+    <string name="perm_location_title">位置情報</string>
+    <string name="perm_location_desc">GPS、速度、ルート</string>
+    <string name="perm_bg_location_title">バックグラウンド位置情報</string>
+    <string name="perm_bg_location_desc">アプリ最小化時のGPS</string>
+    <string name="perm_notifications_title">通知</string>
+    <string name="perm_notifications_desc">録画と衝撃のアラート</string>
+    <string name="perm_grant">付与</string>
+    <string name="perm_open_settings">設定</string>
+    <string name="perm_granted">付与済み</string>
+
     <string name="rec_start">録画開始</string>
     <string name="rec_stop">録画停止</string>
     <string name="rec_recording">録画中</string>

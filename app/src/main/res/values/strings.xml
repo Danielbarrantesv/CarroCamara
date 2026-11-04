@@ -3,18 +3,6 @@
     <string name="app_name">DashCam</string>
     <string name="app_tagline">Tu testigo de camino</string>
 
-    <!-- Permissions rationale -->
-    <string name="perm_camera_title">Cámara</string>
-    <string name="perm_camera_rationale">DashCam necesita la cámara para grabar video mientras conduces.</string>
-    <string name="perm_audio_title">Micrófono</string>
-    <string name="perm_audio_rationale">Permite grabar audio dentro del vehículo (opcional, configurable).</string>
-    <string name="perm_location_title">Ubicación</string>
-    <string name="perm_location_rationale">Permite registrar velocidad, ruta GPS y kilometraje en los reportes.</string>
-    <string name="perm_location_background_title">Ubicación en segundo plano</string>
-    <string name="perm_location_background_rationale">Necesario para que la grabación continúe con datos GPS cuando la app pasa a segundo plano.</string>
-    <string name="perm_notifications_title">Notificaciones</string>
-    <string name="perm_notifications_rationale">Permite mostrar el control de grabación en segundo plano y alertas de impacto.</string>
-
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">Bienvenido a DashCam</string>
     <string name="onboarding_welcome_body">Convierte tu teléfono en una dashcam profesional. Grabación en bucle, telemetría GPS y reportes para tu aseguradora.</string>
@@ -26,6 +14,79 @@
     <string name="onboarding_start">Comenzar a grabar</string>
     <string name="onboarding_continue">Continuar</string>
     <string name="onboarding_skip">Saltar</string>
+
+    <!-- Onboarding: language + folder steps -->
+    <string name="onboarding_language_title">Selecciona tu idioma</string>
+    <string name="onboarding_language_subtitle">Elige el idioma de la aplicación</string>
+    <string name="onboarding_language_continue">Continuar</string>
+    <string name="onboarding_folder_title">Carpeta de videos</string>
+    <string name="onboarding_folder_body">Selecciona dónde quieres que se guarden los videos grabados. Puedes usar el almacenamiento de la app o elegir una carpeta personalizada (recomendado: una carpeta en el almacenamiento interno o una tarjeta SD).</string>
+    <string name="onboarding_folder_custom">Carpeta personalizada</string>
+    <string name="onboarding_folder_default">Carpeta por defecto</string>
+    <string name="onboarding_folder_default_desc">Almacenamiento de la app (no accesible desde otras apps)</string>
+    <string name="onboarding_folder_pick">Elegir carpeta</string>
+    <string name="onboarding_folder_use_default">Usar por defecto</string>
+
+    <!-- Onboarding: welcome -->
+    <string name="onboarding_welcome_app_name">DashCam</string>
+    <string name="onboarding_welcome_tagline">Tu testigo de camino</string>
+    <string name="onboarding_welcome_button">Comenzar</string>
+
+    <!-- Onboarding: permissions -->
+    <string name="onboarding_perm_camera_title">Cámara</string>
+    <string name="onboarding_perm_camera_desc">Para grabar video</string>
+    <string name="onboarding_perm_mic_title">Micrófono</string>
+    <string name="onboarding_perm_mic_desc">Audio opcional</string>
+    <string name="onboarding_perm_location_title">Ubicación</string>
+    <string name="onboarding_perm_location_desc">Velocidad, ruta GPS, kilometraje</string>
+    <string name="onboarding_perm_bg_location_title">Ubicación en segundo plano</string>
+    <string name="onboarding_perm_bg_location_desc">GPS mientras la app está minimizada</string>
+    <string name="onboarding_perm_notifications_title">Notificaciones</string>
+    <string name="onboarding_perm_notifications_desc">Control de grabación y alertas</string>
+    <string name="onboarding_perm_grant_button">Conceder permisos</string>
+    <string name="onboarding_perm_bg_location_button">Solicitar ubicación en segundo plano</string>
+
+    <!-- Settings: sections -->
+    <string name="settings_section_camera">Cámara</string>
+    <string name="settings_section_others">Otros</string>
+    <string name="settings_section_permissions">Permisos</string>
+    <string name="settings_section_language">Idioma</string>
+
+    <!-- Settings: camera -->
+    <string name="settings_default_lens">Cámara por defecto</string>
+    <string name="settings_default_lens_back">Trasera</string>
+    <string name="settings_default_lens_front">Frontal</string>
+    <string name="settings_dual_camera">Doble cámara</string>
+    <string name="settings_dual_camera_desc">Grabar con cámara frontal y trasera a la vez (próximamente)</string>
+
+    <!-- Settings: storage -->
+    <string name="settings_videos_folder">Carpeta de videos</string>
+    <string name="settings_change_location">Cambiar ubicación</string>
+    <string name="settings_reset">Restablecer</string>
+
+    <!-- Settings: others -->
+    <string name="settings_auto_start_desc">Arranca la grabación automáticamente</string>
+    <string name="settings_keep_screen_on_desc">Evita que se apague mientras grabas</string>
+    <string name="settings_audio_desc">Micrófono durante la grabación</string>
+
+    <!-- Settings: language -->
+    <string name="settings_language_title">Idioma de la app</string>
+    <string name="settings_language_desc">Cambia el idioma. Se aplica inmediatamente.</string>
+
+    <!-- Settings: permissions -->
+    <string name="perm_camera_title">Cámara</string>
+    <string name="perm_camera_desc">Necesario para grabar video</string>
+    <string name="perm_mic_title">Micrófono</string>
+    <string name="perm_mic_desc">Audio en los videos (opcional)</string>
+    <string name="perm_location_title">Ubicación</string>
+    <string name="perm_location_desc">GPS, velocidad y ruta</string>
+    <string name="perm_bg_location_title">Ubicación en segundo plano</string>
+    <string name="perm_bg_location_desc">GPS mientras la app está minimizada</string>
+    <string name="perm_notifications_title">Notificaciones</string>
+    <string name="perm_notifications_desc">Alertas de grabación e impactos</string>
+    <string name="perm_grant">Conceder</string>
+    <string name="perm_open_settings">Ajustes</string>
+    <string name="perm_granted">Concedido</string>
 
     <!-- Camera / Recording -->
     <string name="rec_start">Iniciar grabación</string>

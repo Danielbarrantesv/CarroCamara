@@ -50,9 +50,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.danielbarrantesv.dashcam.R
 import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
 import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
@@ -189,13 +191,13 @@ private fun LanguageStep(
     ) {
         Column {
             Text(
-                "Selecciona tu idioma",
+                stringResource(R.string.onboarding_language_title),
                 style = DashCamTypography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Choose your language / Choisissez votre langue / 选择您的语言 / 言語を選択 / Wählen Sie Ihre Sprache",
+                stringResource(R.string.onboarding_language_subtitle),
                 style = DashCamTypography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -226,7 +228,7 @@ private fun LanguageStep(
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Primary)
         ) {
-            Text("Continuar / Continue / Continuer / 继续 / 続ける / Weiter", color = Color.Black, fontWeight = FontWeight.SemiBold, style = DashCamTypography.labelMedium)
+            Text(stringResource(R.string.onboarding_language_continue), color = Color.Black, fontWeight = FontWeight.SemiBold, style = DashCamTypography.labelMedium)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
         }
@@ -256,19 +258,19 @@ private fun WelcomeStep(onContinue: () -> Unit) {
             }
             Spacer(Modifier.height(32.dp))
             Text(
-                text = "DashCam",
+                text = stringResource(R.string.onboarding_welcome_app_name),
                 style = DashCamTypography.displayMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Tu testigo de camino",
+                text = stringResource(R.string.onboarding_welcome_tagline),
                 style = DashCamTypography.titleMedium,
                 color = Primary
             )
             Spacer(Modifier.height(32.dp))
             Text(
-                text = "Convierte tu teléfono en una dashcam profesional. Grabación en bucle, telemetría GPS y reportes para tu aseguradora.",
+                text = stringResource(R.string.onboarding_welcome_body),
                 style = DashCamTypography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -280,7 +282,7 @@ private fun WelcomeStep(onContinue: () -> Unit) {
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Primary)
         ) {
-            Text("Comenzar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.onboarding_welcome_button), color = Color.Black, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
         }
@@ -389,13 +391,13 @@ private fun StorageFolderStep(
     ) {
         Column {
             Text(
-                "Carpeta de videos",
+                stringResource(R.string.onboarding_folder_title),
                 style = DashCamTypography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Selecciona dónde quieres que se guarden los videos grabados. Puedes usar el almacenamiento de la app o elegir una carpeta personalizada (recomendado: una carpeta en el almacenamiento interno o una tarjeta SD).",
+                stringResource(R.string.onboarding_folder_body),
                 style = DashCamTypography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -422,7 +424,7 @@ private fun StorageFolderStep(
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(
-                                if (customUri != null) "Carpeta personalizada" else "Carpeta por defecto",
+                                if (customUri != null) stringResource(R.string.onboarding_folder_custom) else stringResource(R.string.onboarding_folder_default),
                                 style = DashCamTypography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.SemiBold
@@ -432,7 +434,7 @@ private fun StorageFolderStep(
                                     customUri.toString().let {
                                         if (it.length > 60) "…" + it.takeLast(60) else it
                                     }
-                                else "Almacenamiento de la app (no accesible desde otras apps)",
+                                else stringResource(R.string.onboarding_folder_default_desc),
                                 style = DashCamTypography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -454,12 +456,12 @@ private fun StorageFolderStep(
                 OutlinedButton(
                     onClick = onPickFolder,
                     modifier = Modifier.weight(1f).height(48.dp)
-                ) { Text("Elegir carpeta", style = DashCamTypography.labelMedium) }
+                ) { Text(stringResource(R.string.onboarding_folder_pick), style = DashCamTypography.labelMedium) }
                 if (customUri != null) {
                     OutlinedButton(
                         onClick = onClearFolder,
                         modifier = Modifier.weight(1f).height(48.dp)
-                    ) { Text("Usar por defecto", style = DashCamTypography.labelMedium) }
+                    ) { Text(stringResource(R.string.onboarding_folder_use_default), style = DashCamTypography.labelMedium) }
                 }
             }
         }
@@ -469,7 +471,7 @@ private fun StorageFolderStep(
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Primary)
         ) {
-            Text("Continuar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.onboarding_continue), color = Color.Black, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
         }

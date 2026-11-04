@@ -113,7 +113,7 @@ fun SettingsScreen(
             SettingsCard {
                 ToggleRow(
                     title = stringResource(R.string.settings_audio_enabled),
-                    subtitle = "Micrófono durante la grabación",
+                    subtitle = stringResource(R.string.settings_audio_desc),
                     checked = state.audioEnabled,
                     onCheckedChange = viewModel::setAudio
                 )
@@ -138,19 +138,19 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Cámara")
+            SectionHeader(stringResource(R.string.settings_section_camera))
             SettingsCard {
                 QualityRow(
-                    title = "Cámara por defecto",
-                    subtitle = if (state.defaultLens == 0) "Trasera" else "Frontal",
-                    options = listOf("Trasera" to 0, "Frontal" to 1),
+                    title = stringResource(R.string.settings_default_lens),
+                    subtitle = if (state.defaultLens == 0) stringResource(R.string.settings_default_lens_back) else stringResource(R.string.settings_default_lens_front),
+                    options = listOf(stringResource(R.string.settings_default_lens_back) to 0, stringResource(R.string.settings_default_lens_front) to 1),
                     selected = state.defaultLens,
                     onSelect = viewModel::setDefaultLens
                 )
                 DividerLine()
                 ToggleRow(
-                    title = "Doble cámara",
-                    subtitle = "Grabar con cámara frontal y trasera a la vez (próximamente)",
+                    title = stringResource(R.string.settings_dual_camera),
+                    subtitle = stringResource(R.string.settings_dual_camera_desc),
                     checked = state.dualCameraEnabled,
                     onCheckedChange = viewModel::setDualCamera
                 )
@@ -168,7 +168,7 @@ fun SettingsScreen(
                             tint = Primary,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text("Carpeta de videos", style = DashCamTypography.titleSmall,
+                        Text(stringResource(R.string.settings_videos_folder), style = DashCamTypography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurface)
                     }
                     Spacer(Modifier.height(8.dp))
@@ -182,12 +182,12 @@ fun SettingsScreen(
                         OutlinedButton(
                             onClick = { storagePicker.launch(null) },
                             modifier = Modifier.weight(1f).height(44.dp)
-                        ) { Text("Cambiar ubicación", style = DashCamTypography.labelMedium) }
+                        ) { Text(stringResource(R.string.settings_change_location), style = DashCamTypography.labelMedium) }
                         if (state.storageUri != null) {
                             OutlinedButton(
                                 onClick = { viewModel.resetStorageUri() },
                                 modifier = Modifier.weight(1f).height(44.dp)
-                            ) { Text("Restablecer", style = DashCamTypography.labelMedium) }
+                            ) { Text(stringResource(R.string.settings_reset), style = DashCamTypography.labelMedium) }
                         }
                     }
                 }
@@ -226,18 +226,18 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Otros")
+            SectionHeader(stringResource(R.string.settings_section_others))
             SettingsCard {
                 ToggleRow(
                     title = stringResource(R.string.settings_auto_start),
-                    subtitle = "Arranca la grabación automáticamente",
+                    subtitle = stringResource(R.string.settings_auto_start_desc),
                     checked = state.autoStartOnPower,
                     onCheckedChange = viewModel::setAutoStart
                 )
                 DividerLine()
                 ToggleRow(
                     title = stringResource(R.string.settings_keep_screen_on),
-                    subtitle = "Evita que se apague mientras grabas",
+                    subtitle = stringResource(R.string.settings_keep_screen_on_desc),
                     checked = state.keepScreenOn,
                     onCheckedChange = viewModel::setKeepScreenOn
                 )
@@ -245,27 +245,27 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Permisos")
+            SectionHeader(stringResource(R.string.settings_section_permissions))
             SettingsCard {
                 PermissionRow(
-                    title = "Cámara",
-                    subtitle = "Necesario para grabar video",
+                    title = stringResource(R.string.perm_camera_title),
+                    subtitle = stringResource(R.string.perm_camera_desc),
                     granted = com.danielbarrantesv.dashcam.util.Permissions.isCameraGranted(ctx),
                     onRequest = { permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.camera) },
                     onOpenSettings = { openAppSettings(ctx) }
                 )
                 DividerLine()
                 PermissionRow(
-                    title = "Micrófono",
-                    subtitle = "Audio en los videos (opcional)",
+                    title = stringResource(R.string.perm_mic_title),
+                    subtitle = stringResource(R.string.perm_mic_desc),
                     granted = com.danielbarrantesv.dashcam.util.Permissions.isAudioGranted(ctx),
                     onRequest = { permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.recordAudio) },
                     onOpenSettings = { openAppSettings(ctx) }
                 )
                 DividerLine()
                 PermissionRow(
-                    title = "Ubicación",
-                    subtitle = "GPS, velocidad y ruta",
+                    title = stringResource(R.string.perm_location_title),
+                    subtitle = stringResource(R.string.perm_location_desc),
                     granted = com.danielbarrantesv.dashcam.util.Permissions.isLocationGranted(ctx),
                     onRequest = {
                         permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.fineLocation)
@@ -274,8 +274,8 @@ fun SettingsScreen(
                 )
                 DividerLine()
                 PermissionRow(
-                    title = "Ubicación en segundo plano",
-                    subtitle = "GPS mientras la app está minimizada",
+                    title = stringResource(R.string.perm_bg_location_title),
+                    subtitle = stringResource(R.string.perm_bg_location_desc),
                     granted = com.danielbarrantesv.dashcam.util.Permissions.isBackgroundLocationGranted(ctx),
                     onRequest = {
                         if (com.danielbarrantesv.dashcam.util.Permissions.isLocationGranted(ctx)) {
@@ -287,8 +287,8 @@ fun SettingsScreen(
                 )
                 DividerLine()
                 PermissionRow(
-                    title = "Notificaciones",
-                    subtitle = "Alertas de grabación e impactos",
+                    title = stringResource(R.string.perm_notifications_title),
+                    subtitle = stringResource(R.string.perm_notifications_desc),
                     granted = com.danielbarrantesv.dashcam.util.Permissions.isNotificationsGranted(ctx),
                     onRequest = {
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
@@ -301,7 +301,7 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Idioma")
+            SectionHeader(stringResource(R.string.settings_section_language))
             SettingsCard {
                 LanguageRow(
                     selected = state.language,
@@ -433,9 +433,9 @@ private fun LanguageRow(
     onSelect: (AppLanguage) -> Unit
 ) {
     Column(Modifier.padding(12.dp)) {
-        Text("Idioma de la app", style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.settings_language_title), style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
         Text(
-            "Cambia el idioma. Se aplica inmediatamente.",
+            stringResource(R.string.settings_language_desc),
             style = DashCamTypography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -494,7 +494,7 @@ private fun PermissionRow(
         if (granted) {
             Icon(
                 imageVector = Icons.Filled.Check,
-                contentDescription = "Concedido",
+                contentDescription = stringResource(R.string.perm_granted),
                 tint = androidx.compose.ui.graphics.Color(0xFF34C759),
                 modifier = Modifier.size(24.dp)
             )
@@ -505,7 +505,7 @@ private fun PermissionRow(
                 modifier = Modifier.height(36.dp)
             ) {
                 Text(
-                    if (enabled) "Conceder" else "Ajustes",
+                    if (enabled) stringResource(R.string.perm_grant) else stringResource(R.string.perm_open_settings),
                     style = DashCamTypography.labelMedium
                 )
             }

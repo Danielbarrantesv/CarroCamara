@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base theme (dark dashcam) -->
-    <style name="Theme.DashCam" parent="Theme.Material3.Dark.NoActionBar">
+    <!-- Base theme (dark dashcam) — extends AppCompat for locale support -->
+    <style name="Theme.DashCam" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/app_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
