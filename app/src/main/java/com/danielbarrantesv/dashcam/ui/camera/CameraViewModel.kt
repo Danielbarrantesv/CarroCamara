@@ -5,11 +5,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
-import androidx.camera.core.ConcurrentCamera
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCaseGroup
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.FallbackStrategy
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
@@ -153,9 +154,11 @@ class CameraViewModel @Inject constructor(
                 val provider = getCameraProvider(ctx)
                 cameraProvider = provider
 
-                val preview = Preview.Builder().build().also { p ->
-                    p.setSurfaceProvider(previewView.surfaceProvider)
-                }
+                val preview = Preview.Builder()
+                    .setTargetAspectRatio(AspectRatio.RATIO_16_9)
+                    .build().also { p ->
+                        p.setSurfaceProvider(previewView.surfaceProvider)
+                    }
                 previewUseCase = preview
 
                 val quality = settings.videoQuality.first()
@@ -204,10 +207,10 @@ class CameraViewModel @Inject constructor(
                         .addUseCase(frontCapture)
                         .build()
 
-                    val backConfig = ConcurrentCamera.SingleCameraConfig(
+                    val backConfig = androidx.camera.core.ConcurrentCamera.SingleCameraConfig(
                         backSelector, backUseCaseGroup, lifecycleOwner
                     )
-                    val frontConfig = ConcurrentCamera.SingleCameraConfig(
+                    val frontConfig = androidx.camera.core.ConcurrentCamera.SingleCameraConfig(
                         frontSelector, frontUseCaseGroup, lifecycleOwner
                     )
 
@@ -224,13 +227,42 @@ class CameraViewModel @Inject constructor(
                         secondaryCapture = secondaryCap
                     } catch (e: Exception) {
                         Log.w(TAG, "Concurrent camera bind failed, falling back to single", e)
-                        provider.bindToLifecycle(lifecycleOwner, backSelector, preview, backCapture)
-                        primaryCapture = backCapture
-                        secondaryCapture = null
+                        try {
+                            provider.bindToLifecycle(lifecycleOwner, backSelector, preview, backCapture)
+                            primaryCapture = backCapture
+                            secondaryCapture = null
+                        } catch (e2: Exception) {
+                            // Last-resort: bind only video capture (no preview)
+                            provider.bindToLifecycle(lifecycleOwner, selector, capture)
+                            primaryCapture = capture
+                            secondaryCapture = null
+                        }
                     }
                 } else {
-                    provider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
-                    primaryCapture = capture
+                    // Single camera with progressive fallback to avoid
+                    // "No supported surface combination" crashes on devices
+                    // whose camera doesn't support Preview + VideoCapture at the
+                    // requested quality.
+                    try {
+                        provider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
+                        primaryCapture = capture
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Preview+VideoCapture bind failed, trying VideoCapture only", e)
+                        try {
+                            provider.bindToLifecycle(lifecycleOwner, selector, capture)
+                            primaryCapture = capture
+                            _state.value = _state.value.copy(
+                                error = "Vista previa no disponible en esta cámara. " +
+                                    "Grabación funcionará sin preview."
+                            )
+                        } catch (e2: Exception) {
+                            // Final fallback: HD quality
+                            val hdRecorder = buildRecorder(VideoQuality.HD)
+                            val hdCapture = VideoCapture.withOutput(hdRecorder)
+                            provider.bindToLifecycle(lifecycleOwner, selector, preview, hdCapture)
+                            primaryCapture = hdCapture
+                        }
+                    }
                     secondaryCapture = null
                 }
 
@@ -257,6 +289,18 @@ class CameraViewModel @Inject constructor(
         } catch (_: Exception) {}
     }
 
+    /**
+     * Re-attaches a new PreviewView surface to the existing Preview use case
+     * without rebinding. Use this when the user returns to the camera screen
+     * while a recording is in progress (the PreviewView was recreated but
+     * the camera use cases are still bound to the Activity lifecycle).
+     */
+    fun attachPreview(previewView: PreviewView) {
+        try {
+            previewUseCase?.setSurfaceProvider(previewView.surfaceProvider)
+        } catch (_: Exception) {}
+    }
+
     private fun buildRecorder(quality: VideoQuality): Recorder {
         return Recorder.Builder()
             .setQualitySelector(
@@ -266,7 +310,12 @@ class CameraViewModel @Inject constructor(
                         VideoQuality.HD -> Quality.HD
                         VideoQuality.FHD -> Quality.FHD
                         VideoQuality.UHD -> Quality.UHD
-                    }
+                    },
+                    // Critical: without a fallback strategy, binding Preview + VideoCapture
+                    // can throw "No supported surface combination" on devices whose front
+                    // camera doesn't support FHD+Preview simultaneously. The fallback lets
+                    // CameraX step down to a lower quality instead of crashing.
+                    FallbackStrategy.lowerQualityOrHigherThan(Quality.HD)
                 )
             )
             .build()

@@ -19,12 +19,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.danielbarrantesv.dashcam.R
 import com.danielbarrantesv.dashcam.ui.camera.CameraScreen
 import com.danielbarrantesv.dashcam.ui.reports.ReportsScreen
 import com.danielbarrantesv.dashcam.ui.settings.SettingsScreen
@@ -39,14 +41,14 @@ object Routes {
     const val SETTINGS = "settings"
 }
 
-private data class BottomItem(val route: String, val label: String, val icon: ImageVector)
+private data class BottomItem(val route: String, val labelRes: Int, val icon: ImageVector)
 
 private val bottomItems = listOf(
-    BottomItem(Routes.CAMERA, "Cámara", Icons.Filled.PhotoCamera),
-    BottomItem(Routes.TRIPS, "Viajes", Icons.Filled.VideoLibrary),
-    BottomItem(Routes.REPORTS, "Reportes", Icons.Filled.Insights),
-    BottomItem(Routes.TRANSFER, "Transferir", Icons.Filled.Wifi),
-    BottomItem(Routes.SETTINGS, "Ajustes", Icons.Filled.Settings)
+    BottomItem(Routes.CAMERA, R.string.nav_camera, Icons.Filled.PhotoCamera),
+    BottomItem(Routes.TRIPS, R.string.nav_trips, Icons.Filled.VideoLibrary),
+    BottomItem(Routes.REPORTS, R.string.nav_reports, Icons.Filled.Insights),
+    BottomItem(Routes.TRANSFER, R.string.nav_transfer, Icons.Filled.Wifi),
+    BottomItem(Routes.SETTINGS, R.string.nav_settings, Icons.Filled.Settings)
 )
 
 @Composable
@@ -72,8 +74,8 @@ fun DashCamApp() {
                                 restoreState = true
                             }
                         },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
+                        icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+                        label = { Text(stringResource(item.labelRes)) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.Black,
                             selectedTextColor = MaterialTheme.colorScheme.primary,

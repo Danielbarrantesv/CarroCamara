@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -37,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.danielbarrantesv.dashcam.R
 import com.danielbarrantesv.dashcam.data.prefs.AppLanguage
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
 import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
@@ -79,23 +83,43 @@ fun SettingsScreen(
         }
     }
 
+    // Single permission launcher (re-used for each permission row)
+    val permLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ -> /* UI recomposes via state flow */ }
+
+    // Force recomposition when permissions change (after returning from system settings)
+    var permRefreshTrigger by remember { mutableStateOf(0) }
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                permRefreshTrigger++
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    // Read permRefreshTrigger so recomposition happens on resume
+    @Suppress("UNUSED_EXPRESSION") permRefreshTrigger
+
     LazyColumn(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            SectionHeader("Grabación")
+            SectionHeader(stringResource(R.string.settings_section_recording))
             SettingsCard {
                 ToggleRow(
-                    title = "Grabar audio",
+                    title = stringResource(R.string.settings_audio_enabled),
                     subtitle = "Micrófono durante la grabación",
                     checked = state.audioEnabled,
                     onCheckedChange = viewModel::setAudio
                 )
                 DividerLine()
                 QualityRow(
-                    title = "Calidad de video",
+                    title = stringResource(R.string.settings_video_quality),
                     subtitle = state.videoQuality.label,
                     options = VideoQuality.entries.map { it.label to it },
                     selected = state.videoQuality,
@@ -103,7 +127,7 @@ fun SettingsScreen(
                 )
                 DividerLine()
                 SliderRow(
-                    title = "Duración del segmento",
+                    title = stringResource(R.string.settings_segment_duration),
                     valueText = "${state.segmentDurationSec}s",
                     value = state.segmentDurationSec.toFloat(),
                     range = 15f..300f,
@@ -134,7 +158,7 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Almacenamiento")
+            SectionHeader(stringResource(R.string.settings_section_storage))
             SettingsCard {
                 Column(Modifier.padding(12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -169,7 +193,7 @@ fun SettingsScreen(
                 }
                 DividerLine()
                 SliderRow(
-                    title = "Límite de almacenamiento",
+                    title = stringResource(R.string.settings_storage_limit),
                     valueText = "${state.storageLimitGb} GB",
                     value = state.storageLimitGb.toFloat(),
                     range = 1f..30f,
@@ -180,10 +204,10 @@ fun SettingsScreen(
         }
 
         item {
-            SectionHeader("Sensores")
+            SectionHeader(stringResource(R.string.settings_section_sensors))
             SettingsCard {
                 SliderRow(
-                    title = "Umbral de fuerza G",
+                    title = stringResource(R.string.settings_gforce_threshold),
                     valueText = "${"%.2f".format(state.gforceThreshold)} g",
                     value = state.gforceThreshold,
                     range = 0.2f..3.0f,
@@ -192,7 +216,7 @@ fun SettingsScreen(
                 )
                 DividerLine()
                 QualityRow(
-                    title = "Unidad de velocidad",
+                    title = stringResource(R.string.settings_speed_unit),
                     subtitle = state.speedUnit.label,
                     options = SpeedUnit.entries.map { it.label to it },
                     selected = state.speedUnit,
@@ -205,17 +229,73 @@ fun SettingsScreen(
             SectionHeader("Otros")
             SettingsCard {
                 ToggleRow(
-                    title = "Iniciar al conectar cargador",
+                    title = stringResource(R.string.settings_auto_start),
                     subtitle = "Arranca la grabación automáticamente",
                     checked = state.autoStartOnPower,
                     onCheckedChange = viewModel::setAutoStart
                 )
                 DividerLine()
                 ToggleRow(
-                    title = "Mantener pantalla encendida",
+                    title = stringResource(R.string.settings_keep_screen_on),
                     subtitle = "Evita que se apague mientras grabas",
                     checked = state.keepScreenOn,
                     onCheckedChange = viewModel::setKeepScreenOn
+                )
+            }
+        }
+
+        item {
+            SectionHeader("Permisos")
+            SettingsCard {
+                PermissionRow(
+                    title = "Cámara",
+                    subtitle = "Necesario para grabar video",
+                    granted = com.danielbarrantesv.dashcam.util.Permissions.isCameraGranted(ctx),
+                    onRequest = { permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.camera) },
+                    onOpenSettings = { openAppSettings(ctx) }
+                )
+                DividerLine()
+                PermissionRow(
+                    title = "Micrófono",
+                    subtitle = "Audio en los videos (opcional)",
+                    granted = com.danielbarrantesv.dashcam.util.Permissions.isAudioGranted(ctx),
+                    onRequest = { permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.recordAudio) },
+                    onOpenSettings = { openAppSettings(ctx) }
+                )
+                DividerLine()
+                PermissionRow(
+                    title = "Ubicación",
+                    subtitle = "GPS, velocidad y ruta",
+                    granted = com.danielbarrantesv.dashcam.util.Permissions.isLocationGranted(ctx),
+                    onRequest = {
+                        permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.fineLocation)
+                    },
+                    onOpenSettings = { openAppSettings(ctx) }
+                )
+                DividerLine()
+                PermissionRow(
+                    title = "Ubicación en segundo plano",
+                    subtitle = "GPS mientras la app está minimizada",
+                    granted = com.danielbarrantesv.dashcam.util.Permissions.isBackgroundLocationGranted(ctx),
+                    onRequest = {
+                        if (com.danielbarrantesv.dashcam.util.Permissions.isLocationGranted(ctx)) {
+                            permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.backgroundLocation)
+                        }
+                    },
+                    onOpenSettings = { openAppSettings(ctx) },
+                    enabled = com.danielbarrantesv.dashcam.util.Permissions.isLocationGranted(ctx)
+                )
+                DividerLine()
+                PermissionRow(
+                    title = "Notificaciones",
+                    subtitle = "Alertas de grabación e impactos",
+                    granted = com.danielbarrantesv.dashcam.util.Permissions.isNotificationsGranted(ctx),
+                    onRequest = {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                            permLauncher.launch(com.danielbarrantesv.dashcam.util.Permissions.postNotifications)
+                        }
+                    },
+                    onOpenSettings = { openAppSettings(ctx) }
                 )
             }
         }
@@ -235,7 +315,7 @@ fun SettingsScreen(
             SettingsCard {
                 InfoRow("Versión", "1.0.3")
                 DividerLine()
-                InfoRow("Autor", "Daniel Barrantes")
+                InfoRow("Autor", "Daniel Barrantes Villarevia")
                 DividerLine()
                 InfoRow("Repositorio", "github.com/Danielbarrantesv/CarroCamara")
             }
@@ -389,4 +469,55 @@ private fun LanguageRow(
             Spacer(Modifier.height(8.dp))
         }
     }
+}
+
+@Composable
+private fun PermissionRow(
+    title: String,
+    subtitle: String,
+    granted: Boolean,
+    onRequest: () -> Unit,
+    onOpenSettings: () -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(title, style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+            Text(subtitle, style = DashCamTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Spacer(Modifier.width(8.dp))
+        if (granted) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = "Concedido",
+                tint = androidx.compose.ui.graphics.Color(0xFF34C759),
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            OutlinedButton(
+                onClick = if (enabled) onRequest else onOpenSettings,
+                enabled = true,
+                modifier = Modifier.height(36.dp)
+            ) {
+                Text(
+                    if (enabled) "Conceder" else "Ajustes",
+                    style = DashCamTypography.labelMedium
+                )
+            }
+        }
+    }
+}
+
+/** Opens the system app details page so the user can grant permissions manually. */
+private fun openAppSettings(ctx: android.content.Context) {
+    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = android.net.Uri.fromParts("package", ctx.packageName, null)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    ctx.startActivity(intent)
 }

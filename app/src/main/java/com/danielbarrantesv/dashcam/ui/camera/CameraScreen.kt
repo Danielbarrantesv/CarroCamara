@@ -79,7 +79,12 @@ fun CameraScreen() {
     }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
+    // CRITICAL: bind camera to the ACTIVITY lifecycle, not the NavBackStackEntry.
+    // NavBackStackEntry's lifecycle goes to STOPPED when the user switches tabs,
+    // which would tear down the camera and corrupt the recording. The Activity
+    // stays RESUMED while the app is foregrounded, so the camera keeps running.
+    val lifecycleOwner = if (activity is androidx.lifecycle.LifecycleOwner) activity
+        else LocalLifecycleOwner.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -91,10 +96,20 @@ fun CameraScreen() {
         }
     }
 
-    // Rebind camera whenever lensFacing changes OR on first composition.
-    // Only bind if not currently recording (to avoid interrupting an active recording).
-    LaunchedEffect(state.lensFacing) {
+    // Rebind camera when lensFacing changes OR when the composable re-enters
+    // composition after a tab switch. Using a stable key (Unit) means it fires
+    // every time the user returns to this screen, ensuring the preview surface
+    // is re-attached to the (still-running) Preview use case.
+    LaunchedEffect(state.lensFacing, lifecycleOwner) {
         viewModel.bindCamera(lifecycleOwner, previewView)
+    }
+
+    // Re-attach the preview surface whenever the PreviewView is recreated
+    // (e.g. on configuration change or returning from another tab).
+    LaunchedEffect(previewView) {
+        if (state.isRecording) {
+            viewModel.attachPreview(previewView)
+        }
     }
 
     // IMPORTANT: We do NOT call viewModel.cleanup() on dispose.
