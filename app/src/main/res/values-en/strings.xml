@@ -1,0 +1,133 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">Your road witness</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Welcome to DashCam</string>
+    <string name="onboarding_welcome_body">Turn your phone into a professional dashcam. Loop recording, GPS telemetry, and reports for your insurer.</string>
+    <string name="onboarding_storage_title">Configure your storage</string>
+    <string name="onboarding_storage_body">Specify how much disk space to allocate for videos. When full, the oldest will be deleted automatically.</string>
+    <string name="onboarding_storage_unit">GB</string>
+    <string name="onboarding_permissions_title">Required permissions</string>
+    <string name="onboarding_permissions_body">DashCam needs several permissions to work properly in the background.</string>
+    <string name="onboarding_start">Start recording</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_skip">Skip</string>
+
+    <!-- Recording -->
+    <string name="rec_start">Start recording</string>
+    <string name="rec_stop">Stop recording</string>
+    <string name="rec_recording">Recording</string>
+    <string name="rec_paused">Paused</string>
+    <string name="rec_stopped">Stopped</string>
+    <string name="rec_capture_photo">Capture photo</string>
+    <string name="rec_emergency_save">Save event</string>
+    <string name="rec_rotate">Rotate screen</string>
+    <string name="rec_switch_camera">Switch camera</string>
+    <string name="rec_duration">Duration</string>
+    <string name="rec_segment">Current segment</string>
+    <string name="rec_storage_used">Storage used</string>
+
+    <!-- HUD -->
+    <string name="hud_speed">Speed</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">Distance</string>
+    <string name="hud_distance_unit">km</string>
+    <string name="hud_gforce">G-force</string>
+    <string name="hud_coordinates">Coordinates</string>
+    <string name="hud_altitude">Altitude</string>
+    <string name="hud_altitude_unit">m</string>
+    <string name="hud_heading">Heading</string>
+    <string name="hud_no_gps">No GPS signal</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_camera">Camera</string>
+    <string name="nav_trips">Trips</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_transfer">Transfer</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Trips -->
+    <string name="trips_title">Recorded trips</string>
+    <string name="trips_empty">No trips recorded yet.</string>
+    <string name="trips_distance">Distance</string>
+    <string name="trips_duration">Duration</string>
+    <string name="trips_max_speed">Max speed</string>
+    <string name="trips_avg_speed">Avg speed</string>
+    <string name="trips_events">Events</string>
+    <string name="trips_delete">Delete trip</string>
+    <string name="trips_export_report">Generate PDF report</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Insurer reports</string>
+    <string name="reports_empty">No reports generated yet.</string>
+    <string name="reports_generate">Generate report</string>
+    <string name="reports_share">Share</string>
+    <string name="reports_open">Open</string>
+    <string name="reports_delete">Delete</string>
+    <string name="reports_generating">Generating PDF report…</string>
+
+    <!-- Transfer -->
+    <string name="transfer_title">WiFi transfer</string>
+    <string name="transfer_start_server">Start server</string>
+    <string name="transfer_stop_server">Stop server</string>
+    <string name="transfer_server_running">Server running at:</string>
+    <string name="transfer_server_stopped">Server stopped</string>
+    <string name="transfer_qr">Scan to open on another device</string>
+    <string name="transfer_open_browser">Open in browser</string>
+    <string name="transfer_videos">Available videos</string>
+    <string name="transfer_reports">Available reports</string>
+    <string name="transfer_no_wifi">Connect to a WiFi network to use this feature.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_recording">Recording</string>
+    <string name="settings_section_storage">Storage</string>
+    <string name="settings_section_sensors">Sensors</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_video_quality">Video quality</string>
+    <string name="settings_segment_duration">Segment duration</string>
+    <string name="settings_storage_limit">Storage limit</string>
+    <string name="settings_audio_enabled">Record audio</string>
+    <string name="settings_gforce_threshold">G-force threshold (g)</string>
+    <string name="settings_speed_unit">Speed unit</string>
+    <string name="settings_auto_start">Start when charger connected</string>
+    <string name="settings_keep_screen_on">Keep screen on</string>
+    <string name="settings_about_version">Version</string>
+    <string name="settings_about_author">Author</string>
+    <string name="settings_about_repo">Repository</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_recording">Recording in progress</string>
+    <string name="notif_channel_recording_desc">Persistent notification while DashCam records in background.</string>
+    <string name="notif_channel_events">Impact events</string>
+    <string name="notif_channel_events_desc">Alerts when high G-force is detected.</string>
+    <string name="notif_channel_transfer">WiFi transfer</string>
+    <string name="notif_channel_transfer_desc">Local HTTP server active notification.</string>
+    <string name="notif_recording_title">DashCam recording</string>
+    <string name="notif_recording_text">Tap to return to camera</string>
+    <string name="notif_event_title">Impact detected</string>
+    <string name="notif_event_text">G-force: %1$.2f g — Event saved</string>
+    <string name="notif_server_title">DashCam server active</string>
+    <string name="notif_server_text">Available at %1$s</string>
+
+    <!-- Errors -->
+    <string name="error_camera_unavailable">Could not access the camera.</string>
+    <string name="error_storage_full">Storage full. Free space or adjust the limit in Settings.</string>
+    <string name="error_gps_unavailable">GPS unavailable. Make sure it\'s enabled.</string>
+    <string name="error_report_generation">Could not generate the PDF report.</string>
+    <string name="error_server_start">Could not start the server. Check WiFi.</string>
+
+    <!-- Common -->
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_back">Back</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_grant">Grant</string>
+    <string name="action_close">Close</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="content_desc_record">Record button</string>
+    <string name="content_desc_photo">Photo capture button</string>
+    <string name="content_desc_rotate">Rotate screen</string>
+    <string name="content_desc_switch">Switch camera</string>
+</resources>

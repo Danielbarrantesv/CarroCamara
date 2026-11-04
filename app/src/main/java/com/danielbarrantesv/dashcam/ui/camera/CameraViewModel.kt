@@ -3,9 +3,12 @@ package com.danielbarrantesv.dashcam.ui.camera
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
+import androidx.camera.core.ConcurrentCamera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
+import androidx.camera.core.UseCaseGroup
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
@@ -63,7 +66,8 @@ data class CameraUiState(
     val startedAt: Long = 0,
     val error: String? = null,
     val lastEventLabel: String? = null,
-    val dualCameraEnabled: Boolean = false
+    val dualCameraEnabled: Boolean = false,
+    val storageUri: String? = null
 )
 
 @HiltViewModel
@@ -79,8 +83,12 @@ class CameraViewModel @Inject constructor(
     val state: StateFlow<CameraUiState> = _state.asStateFlow()
 
     private var cameraProvider: ProcessCameraProvider? = null
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var activeRecording: Recording? = null
+    // Primary capture (the one whose preview we show, and the one used for single-lens recording)
+    private var primaryCapture: VideoCapture<Recorder>? = null
+    // Secondary capture (only used when dual-camera recording is enabled)
+    private var secondaryCapture: VideoCapture<Recorder>? = null
+    private var primaryRecording: Recording? = null
+    private var secondaryRecording: Recording? = null
 
     private var currentTripId: Long = 0L
     private var tripStartMs: Long = 0L
@@ -92,7 +100,6 @@ class CameraViewModel @Inject constructor(
     private var gForceJob: Job? = null
 
     init {
-        // Load default lens + speed unit + dual camera setting
         viewModelScope.launch {
             settings.defaultLens.collect { lens ->
                 _state.value = _state.value.copy(lensFacing = lens)
@@ -108,11 +115,17 @@ class CameraViewModel @Inject constructor(
                 _state.value = _state.value.copy(dualCameraEnabled = enabled)
             }
         }
+        viewModelScope.launch {
+            settings.storageUri.collect { uri ->
+                _state.value = _state.value.copy(storageUri = uri)
+            }
+        }
     }
 
     /**
-     * Binds Preview + VideoCapture use cases to the given lifecycleOwner and surfaces
-     * the preview onto [previewView]. Called from CameraScreen's LaunchedEffect.
+     * Binds Preview + primary VideoCapture use case to the given lifecycleOwner and surfaces
+     * the preview onto [previewView]. If dual camera is enabled and the device supports it,
+     * a secondary VideoCapture is also bound for the other lens.
      */
     fun bindCamera(lifecycleOwner: LifecycleOwner, previewView: PreviewView) {
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA)
@@ -132,30 +145,73 @@ class CameraViewModel @Inject constructor(
                 }
 
                 val quality = settings.videoQuality.first()
-                val recorder = Recorder.Builder()
-                    .setQualitySelector(
-                        QualitySelector.from(
-                            when (quality) {
-                                VideoQuality.SD -> Quality.SD
-                                VideoQuality.HD -> Quality.HD
-                                VideoQuality.FHD -> Quality.FHD
-                                VideoQuality.UHD -> Quality.UHD
-                            }
-                        )
-                    )
-                    .build()
+                val recorder = buildRecorder(quality)
                 val capture = VideoCapture.withOutput(recorder)
-                videoCapture = capture
 
                 val selector = CameraSelector.Builder()
                     .requireLensFacing(_state.value.lensFacing)
                     .build()
 
                 provider.unbindAll()
-                provider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
+
+                val dualEnabled = settings.dualCameraEnabled.first() &&
+                    try { provider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) && provider.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) } catch (_: Exception) { false }
+
+                if (dualEnabled) {
+                    // Use CameraX ConcurrentCamera API (CameraX 1.4+)
+                    val backSelector = if (_state.value.lensFacing == CameraSelector.LENS_FACING_BACK)
+                        CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
+                    val frontSelector = if (_state.value.lensFacing == CameraSelector.LENS_FACING_BACK)
+                        CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+
+                    val backRecorder = buildRecorder(quality)
+                    val backCapture = VideoCapture.withOutput(backRecorder)
+                    val frontRecorder = buildRecorder(quality)
+                    val frontCapture = VideoCapture.withOutput(frontRecorder)
+
+                    // Decide which one is "primary" (its preview we show)
+                    val primaryCap: VideoCapture<Recorder>
+                    val secondaryCap: VideoCapture<Recorder>
+
+                    val backUseCaseGroup = UseCaseGroup.Builder()
+                        .addUseCase(preview)
+                        .addUseCase(backCapture)
+                        .build()
+                    val frontUseCaseGroup = UseCaseGroup.Builder()
+                        .addUseCase(frontCapture)
+                        .build()
+
+                    val backConfig = ConcurrentCamera.SingleCameraConfig(
+                        backSelector, backUseCaseGroup, lifecycleOwner
+                    )
+                    val frontConfig = ConcurrentCamera.SingleCameraConfig(
+                        frontSelector, frontUseCaseGroup, lifecycleOwner
+                    )
+
+                    try {
+                        provider.bindToLifecycle(listOf(backConfig, frontConfig))
+                        if (_state.value.lensFacing == CameraSelector.LENS_FACING_BACK) {
+                            primaryCap = backCapture
+                            secondaryCap = frontCapture
+                        } else {
+                            primaryCap = frontCapture
+                            secondaryCap = backCapture
+                        }
+                        primaryCapture = primaryCap
+                        secondaryCapture = secondaryCap
+                    } catch (e: Exception) {
+                        // Concurrent camera not supported — fall back to single
+                        provider.bindToLifecycle(lifecycleOwner, backSelector, preview, backCapture)
+                        primaryCapture = backCapture
+                        secondaryCapture = null
+                    }
+                } else {
+                    provider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
+                    primaryCapture = capture
+                    secondaryCapture = null
+                }
 
                 _state.value = _state.value.copy(isCameraBound = true, error = null)
-
                 startGpsStream()
             } catch (e: Exception) {
                 Log.e(TAG, "bindCamera failed", e)
@@ -167,6 +223,21 @@ class CameraViewModel @Inject constructor(
         }
     }
 
+    private fun buildRecorder(quality: VideoQuality): Recorder {
+        return Recorder.Builder()
+            .setQualitySelector(
+                QualitySelector.from(
+                    when (quality) {
+                        VideoQuality.SD -> Quality.SD
+                        VideoQuality.HD -> Quality.HD
+                        VideoQuality.FHD -> Quality.FHD
+                        VideoQuality.UHD -> Quality.UHD
+                    }
+                )
+            )
+            .build()
+    }
+
     fun toggleRecording() {
         if (_state.value.isRecording) {
             stopRecording()
@@ -176,7 +247,7 @@ class CameraViewModel @Inject constructor(
     }
 
     private fun startRecording() {
-        val capture = videoCapture ?: run {
+        val capture = primaryCapture ?: run {
             _state.value = _state.value.copy(error = "Cámara no lista. Cierra y abre la app.")
             return
         }
@@ -184,6 +255,9 @@ class CameraViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val audioEnabled = settings.audioEnabled.first()
+                val dualEnabled = _state.value.dualCameraEnabled && secondaryCapture != null
+                val storageUriStr = settings.storageUri.first()
+                val storageTreeUri = storageUriStr?.let { Uri.parse(it) }
 
                 tripStartMs = System.currentTimeMillis()
                 currentTripId = tripRepo.startTrip(tripStartMs, _state.value.lat, _state.value.lon)
@@ -201,7 +275,20 @@ class CameraViewModel @Inject constructor(
                     lastEventLabel = null
                 )
 
-                startNextSegment(audioEnabled)
+                val primaryLens = lensLabel(_state.value.lensFacing)
+                startNextSegment(capture, primaryLens, audioEnabled, storageTreeUri)
+
+                if (dualEnabled) {
+                    val secondaryLens = lensLabel(
+                        if (_state.value.lensFacing == CameraSelector.LENS_FACING_BACK)
+                            CameraSelector.LENS_FACING_FRONT
+                        else CameraSelector.LENS_FACING_BACK
+                    )
+                    secondaryCapture?.let { secCap ->
+                        startSecondarySegment(secCap, secondaryLens, audioEnabled, storageTreeUri)
+                    }
+                }
+
                 startTimer()
                 startGForceStream()
             } catch (e: Exception) {
@@ -211,8 +298,15 @@ class CameraViewModel @Inject constructor(
         }
     }
 
-    private fun startNextSegment(audioEnabled: Boolean) {
-        val capture = videoCapture ?: return
+    private fun lensLabel(lens: Int): String =
+        if (lens == CameraSelector.LENS_FACING_BACK) "Back" else "Front"
+
+    private fun startNextSegment(
+        capture: VideoCapture<Recorder>,
+        lensLabel: String,
+        audioEnabled: Boolean,
+        storageTreeUri: Uri?
+    ) {
         val tripId = currentTripId
         val index = segmentIndex
 
@@ -228,20 +322,20 @@ class CameraViewModel @Inject constructor(
                     used = tripRepo.totalVideoSizeBytes()
                 }
 
-                val outFile = FileUtils.videoFileForSegment(ctx, tripId, index)
+                val outFile = FileUtils.videoFileForSegment(ctx, tripId, index, lensLabel)
                 val outputOpts = FileOutputOptions.Builder(outFile).build()
                 val pending = capture.output.prepareRecording(ctx, outputOpts)
 
                 currentSegmentStartMs = System.currentTimeMillis()
 
-                activeRecording = if (audioEnabled) {
+                primaryRecording = if (audioEnabled) {
                     pending.withAudioEnabled()
                         .start(ContextCompat.getMainExecutor(ctx)) { event ->
-                            handleVideoEvent(event, tripId, index, outFile)
+                            handleVideoEvent(event, tripId, index, lensLabel, outFile, storageTreeUri, isSecondary = false)
                         }
                 } else {
                     pending.start(ContextCompat.getMainExecutor(ctx)) { event ->
-                        handleVideoEvent(event, tripId, index, outFile)
+                        handleVideoEvent(event, tripId, index, lensLabel, outFile, storageTreeUri, isSecondary = false)
                     }
                 }
 
@@ -256,34 +350,73 @@ class CameraViewModel @Inject constructor(
         }
     }
 
+    private fun startSecondarySegment(
+        capture: VideoCapture<Recorder>,
+        lensLabel: String,
+        audioEnabled: Boolean,
+        storageTreeUri: Uri?
+    ) {
+        val tripId = currentTripId
+        val index = segmentIndex
+
+        viewModelScope.launch {
+            try {
+                val outFile = FileUtils.videoFileForSegment(ctx, tripId, index, lensLabel)
+                val outputOpts = FileOutputOptions.Builder(outFile).build()
+                val pending = capture.output.prepareRecording(ctx, outputOpts)
+
+                // Note: secondary camera cannot use audio (only one mic at a time)
+                secondaryRecording = pending.start(ContextCompat.getMainExecutor(ctx)) { event ->
+                    handleVideoEvent(event, tripId, index, lensLabel, outFile, storageTreeUri, isSecondary = true)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "startSecondarySegment failed", e)
+            }
+        }
+    }
+
     private fun handleVideoEvent(
         event: VideoRecordEvent,
         tripId: Long,
         index: Int,
-        outFile: File
+        lensLabel: String,
+        outFile: File,
+        storageTreeUri: Uri?,
+        isSecondary: Boolean
     ) {
         when (event) {
             is VideoRecordEvent.Finalize -> {
                 if (!event.hasError()) {
                     viewModelScope.launch {
                         val durationMs = System.currentTimeMillis() - currentSegmentStartMs
+                        // If a custom storage folder is set, move the file there
+                        val finalUri = FileUtils.moveToCustomStorage(
+                            ctx, outFile, storageTreeUri, outFile.name
+                        )
+                        val finalPath = finalUri?.toString() ?: outFile.absolutePath
+
                         tripRepo.addSegment(
                             VideoSegmentEntity(
                                 tripId = tripId,
-                                filePath = outFile.absolutePath,
+                                filePath = finalPath,
                                 createdAt = currentSegmentStartMs,
                                 durationMs = durationMs,
-                                sizeBytes = outFile.length()
+                                sizeBytes = if (storageTreeUri != null) {
+                                    // File was moved to SAF, size is what we recorded
+                                    outFile.length().takeIf { it > 0 } ?: 0L
+                                } else outFile.length()
                             )
                         )
-                        if (_state.value.isRecording) {
+                        if (_state.value.isRecording && !isSecondary) {
                             val audio = settings.audioEnabled.first()
-                            startNextSegment(audio)
+                            // Restart only the primary segment
+                            primaryCapture?.let { cap ->
+                                startNextSegment(cap, lensLabel, audio, storageTreeUri)
+                            }
                         }
                     }
                 } else {
-                    Log.e(TAG, "Finalize error: ${event.cause}")
-                    // Don't propagate "Recording stopped" when user leaves app
+                    Log.e(TAG, "Finalize error ($lensLabel): ${event.cause}")
                     val cause = event.cause
                     if (cause != null && _state.value.isRecording) {
                         _state.value = _state.value.copy(
@@ -404,10 +537,10 @@ class CameraViewModel @Inject constructor(
     }
 
     private fun stopRecording() {
-        try {
-            activeRecording?.stop()
-        } catch (_: Exception) {}
-        activeRecording = null
+        try { primaryRecording?.stop() } catch (_: Exception) {}
+        try { secondaryRecording?.stop() } catch (_: Exception) {}
+        primaryRecording = null
+        secondaryRecording = null
         timerJob?.cancel()
         gForceJob?.cancel()
 
@@ -446,10 +579,6 @@ class CameraViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Called when the user leaves the screen (onDispose/onCleared).
-     * Stops the recording gracefully without showing an error.
-     */
     fun cleanup() {
         if (_state.value.isRecording) {
             stopRecording()
@@ -457,10 +586,10 @@ class CameraViewModel @Inject constructor(
         timerJob?.cancel()
         gpsJob?.cancel()
         gForceJob?.cancel()
-        try {
-            activeRecording?.stop()
-        } catch (_: Exception) {}
-        activeRecording = null
+        try { primaryRecording?.stop() } catch (_: Exception) {}
+        try { secondaryRecording?.stop() } catch (_: Exception) {}
+        primaryRecording = null
+        secondaryRecording = null
     }
 
     fun toggleLens() {
@@ -474,7 +603,6 @@ class CameraViewModel @Inject constructor(
             lensFacing = newLens,
             isCameraBound = false
         )
-        // Persist as new default
         viewModelScope.launch { settings.setDefaultLens(newLens) }
     }
 

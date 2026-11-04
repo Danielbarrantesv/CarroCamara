@@ -37,6 +37,20 @@ enum class SpeedUnit(val label: String, val factor: Float) {
     }
 }
 
+/** App language — affects locale applied via AppCompatDelegate.setApplicationLocales(). */
+enum class AppLanguage(val tag: String, val display: String) {
+    ES("es", "Español"),
+    EN("en", "English"),
+    FR("fr", "Français"),
+    ZH("zh", "中文"),
+    JA("ja", "日本語"),
+    DE("de", "Deutsch");
+
+    companion object {
+        fun fromTag(tag: String?): AppLanguage = entries.firstOrNull { it.tag == tag } ?: ES
+    }
+}
+
 @Singleton
 class SettingsRepository @Inject constructor(
     @ApplicationContext private val ctx: Context
@@ -55,6 +69,7 @@ class SettingsRepository @Inject constructor(
         val STORAGE_URI = stringPreferencesKey("storage_uri")
         val DUAL_CAMERA = booleanPreferencesKey("dual_camera")
         val DEFAULT_LENS = intPreferencesKey("default_lens") // 0 = back, 1 = front
+        val LANGUAGE = stringPreferencesKey("language")
     }
 
     val hasCompletedOnboarding: Flow<Boolean> =
@@ -139,4 +154,11 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setDefaultLens(lens: Int) =
         ctx.dataStore.edit { it[Keys.DEFAULT_LENS] = lens.coerceIn(0, 1) }
+
+    // ---- App language ----
+    val language: Flow<AppLanguage> =
+        ctx.dataStore.data.map { AppLanguage.fromTag(it[Keys.LANGUAGE]) }
+
+    suspend fun setLanguage(lang: AppLanguage) =
+        ctx.dataStore.edit { it[Keys.LANGUAGE] = lang.tag }
 }

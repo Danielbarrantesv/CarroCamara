@@ -140,6 +140,7 @@ fun TripsScreen(
                             trip = trip,
                             isExpanded = isExpanded,
                             segments = tripSegments[trip.id] ?: emptyList(),
+                            viewModel = viewModel,
                             onToggleExpand = {
                                 val newValue = !isExpanded
                                 expandedTrips[trip.id] = newValue
@@ -150,18 +151,12 @@ fun TripsScreen(
                                 }
                             },
                             onPlaySegment = { seg ->
-                                val file = File(seg.filePath)
-                                if (file.exists()) {
-                                    playingUri = Uri.fromFile(file)
-                                } else {
-                                    // Try sharing via FileProvider
-                                    val uri = FileUtils.fileUri(ctx, file)
+                                viewModel.segmentPlayUri(seg)?.let { uri ->
                                     playingUri = uri
                                 }
                             },
                             onDeleteSegment = { seg ->
                                 viewModel.deleteSegment(seg)
-                                // Refresh segments list
                                 viewModel.getSegmentsForTrip(trip.id) { segs ->
                                     tripSegments[trip.id] = segs
                                 }
@@ -260,6 +255,7 @@ private fun TripCard(
     trip: TripEntity,
     isExpanded: Boolean,
     segments: List<VideoSegmentEntity>,
+    viewModel: TripsViewModel,
     onToggleExpand: () -> Unit,
     onPlaySegment: (VideoSegmentEntity) -> Unit,
     onDeleteSegment: (VideoSegmentEntity) -> Unit,
@@ -352,6 +348,7 @@ private fun TripCard(
                         segments.forEach { seg ->
                             VideoSegmentItem(
                                 segment = seg,
+                                exists = viewModel.segmentExists(seg),
                                 onPlay = { onPlaySegment(seg) },
                                 onDelete = { onDeleteSegment(seg) }
                             )
@@ -367,11 +364,13 @@ private fun TripCard(
 @Composable
 private fun VideoSegmentItem(
     segment: VideoSegmentEntity,
+    exists: Boolean,
     onPlay: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val file = File(segment.filePath)
-    val exists = file.exists()
+    val displayName = segment.filePath.substringAfterLast('/').let {
+        if (it.startsWith("content://")) "video_${segment.id}.mp4" else it
+    }
     Row(
         Modifier
             .fillMaxWidth()
@@ -389,7 +388,7 @@ private fun VideoSegmentItem(
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                file.name,
+                displayName,
                 style = DashCamTypography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium

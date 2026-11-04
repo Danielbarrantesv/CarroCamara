@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">您的行车见证人</string>
+
+    <string name="onboarding_welcome_title">欢迎使用 DashCam</string>
+    <string name="onboarding_welcome_body">将您的手机变成专业的行车记录仪。循环录制、GPS 遥测和保险公司报告。</string>
+    <string name="onboarding_storage_title">配置存储</string>
+    <string name="onboarding_storage_body">指定要为视频分配多少磁盘空间。当满了时，最旧的视频将自动删除。</string>
+    <string name="onboarding_storage_unit">GB</string>
+    <string name="onboarding_permissions_title">所需权限</string>
+    <string name="onboarding_permissions_body">DashCam 需要多项权限才能在后台正常运行。</string>
+    <string name="onboarding_start">开始录制</string>
+    <string name="onboarding_continue">继续</string>
+    <string name="onboarding_skip">跳过</string>
+
+    <string name="rec_start">开始录制</string>
+    <string name="rec_stop">停止录制</string>
+    <string name="rec_recording">录制中</string>
+    <string name="rec_rotate">旋转屏幕</string>
+    <string name="rec_switch_camera">切换摄像头</string>
+
+    <string name="hud_speed">速度</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">距离</string>
+    <string name="hud_gforce">G 力</string>
+    <string name="hud_no_gps">无 GPS 信号</string>
+
+    <string name="nav_camera">摄像头</string>
+    <string name="nav_trips">行程</string>
+    <string name="nav_reports">报告</string>
+    <string name="nav_transfer">传输</string>
+    <string name="nav_settings">设置</string>
+
+    <string name="trips_title">已录制的行程</string>
+    <string name="trips_empty">尚未录制任何行程。</string>
+    <string name="trips_delete">删除行程</string>
+    <string name="trips_export_report">生成 PDF 报告</string>
+
+    <string name="reports_title">保险公司报告</string>
+    <string name="reports_empty">尚未生成任何报告。</string>
+    <string name="reports_generate">生成报告</string>
+    <string name="reports_share">分享</string>
+    <string name="reports_open">打开</string>
+    <string name="reports_delete">删除</string>
+    <string name="reports_generating">正在生成 PDF 报告…</string>
+
+    <string name="transfer_title">WiFi 传输</string>
+    <string name="transfer_start_server">启动服务器</string>
+    <string name="transfer_stop_server">停止服务器</string>
+    <string name="transfer_open_browser">在浏览器中打开</string>
+
+    <string name="settings_title">设置</string>
+    <string name="settings_section_recording">录制</string>
+    <string name="settings_section_storage">存储</string>
+    <string name="settings_section_sensors">传感器</string>
+    <string name="settings_section_about">关于</string>
+    <string name="settings_video_quality">视频质量</string>
+    <string name="settings_segment_duration">片段时长</string>
+    <string name="settings_storage_limit">存储限制</string>
+    <string name="settings_audio_enabled">录制音频</string>
+    <string name="settings_gforce_threshold">G 力阈值 (g)</string>
+    <string name="settings_speed_unit">速度单位</string>
+    <string name="settings_auto_start">连接充电器时启动</string>
+    <string name="settings_keep_screen_on">保持屏幕开启</string>
+
+    <string name="notif_recording_title">DashCam 正在录制</string>
+    <string name="notif_event_title">检测到碰撞</string>
+    <string name="notif_server_title">DashCam 服务器已激活</string>
+
+    <string name="action_ok">确定</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_back">返回</string>
+    <string name="action_close">关闭</string>
+</resources>

@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">Ihr Straßenzeuge</string>
+
+    <string name="onboarding_welcome_title">Willkommen bei DashCam</string>
+    <string name="onboarding_welcome_body">Verwandle dein Telefon in eine professionelle Dashcam. Schleifenaufzeichnung, GPS-Telemetrie und Berichte für deine Versicherung.</string>
+    <string name="onboarding_storage_title">Speicher konfigurieren</string>
+    <string name="onboarding_storage_body">Gib an, wie viel Speicherplatz für Videos zugewiesen werden soll. Wenn voll, werden die ältesten automatisch gelöscht.</string>
+    <string name="onboarding_storage_unit">GB</string>
+    <string name="onboarding_permissions_title">Erforderliche Berechtigungen</string>
+    <string name="onboarding_permissions_body">DashCam benötigt mehrere Berechtigungen, um im Hintergrund zu funktionieren.</string>
+    <string name="onboarding_start">Aufnahme starten</string>
+    <string name="onboarding_continue">Weiter</string>
+    <string name="onboarding_skip">Überspringen</string>
+
+    <string name="rec_start">Aufnahme starten</string>
+    <string name="rec_stop">Aufnahme stoppen</string>
+    <string name="rec_recording">Aufnahme</string>
+    <string name="rec_rotate">Bildschirm drehen</string>
+    <string name="rec_switch_camera">Kamera wechseln</string>
+
+    <string name="hud_speed">Geschwindigkeit</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">Entfernung</string>
+    <string name="hud_gforce">G-Kraft</string>
+    <string name="hud_no_gps">Kein GPS-Signal</string>
+
+    <string name="nav_camera">Kamera</string>
+    <string name="nav_trips">Fahrten</string>
+    <string name="nav_reports">Berichte</string>
+    <string name="nav_transfer">Übertragung</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <string name="trips_title">Aufgezeichnete Fahrten</string>
+    <string name="trips_empty">Noch keine Fahrten aufgezeichnet.</string>
+    <string name="trips_delete">Fahrt löschen</string>
+    <string name="trips_export_report">PDF-Bericht erstellen</string>
+
+    <string name="reports_title">Versicherungsberichte</string>
+    <string name="reports_empty">Noch keine Berichte erstellt.</string>
+    <string name="reports_generate">Bericht erstellen</string>
+    <string name="reports_share">Teilen</string>
+    <string name="reports_open">Öffnen</string>
+    <string name="reports_delete">Löschen</string>
+    <string name="reports_generating">PDF-Bericht wird erstellt…</string>
+
+    <string name="transfer_title">WiFi-Übertragung</string>
+    <string name="transfer_start_server">Server starten</string>
+    <string name="transfer_stop_server">Server stoppen</string>
+    <string name="transfer_open_browser">Im Browser öffnen</string>
+
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_recording">Aufnahme</string>
+    <string name="settings_section_storage">Speicher</string>
+    <string name="settings_section_sensors">Sensoren</string>
+    <string name="settings_section_about">Über</string>
+    <string name="settings_video_quality">Videoqualität</string>
+    <string name="settings_segment_duration">Segmentdauer</string>
+    <string name="settings_storage_limit">Speicherlimit</string>
+    <string name="settings_audio_enabled">Audio aufnehmen</string>
+    <string name="settings_gforce_threshold">G-Kraft-Schwelle (g)</string>
+    <string name="settings_speed_unit">Geschwindigkeitseinheit</string>
+    <string name="settings_auto_start">Bei Ladegerät starten</string>
+    <string name="settings_keep_screen_on">Bildschirm an lassen</string>
+
+    <string name="notif_recording_title">DashCam zeichnet auf</string>
+    <string name="notif_event_title">Aufprall erkannt</string>
+    <string name="notif_server_title">DashCam-Server aktiv</string>
+
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_close">Schließen</string>
+</resources>

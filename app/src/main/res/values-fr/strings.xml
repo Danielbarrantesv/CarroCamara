@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">Votre témoin de route</string>
+
+    <string name="onboarding_welcome_title">Bienvenue sur DashCam</string>
+    <string name="onboarding_welcome_body">Transformez votre téléphone en dashcam professionnelle. Enregistrement en boucle, télémétrie GPS et rapports pour votre assurance.</string>
+    <string name="onboarding_storage_title">Configurez votre stockage</string>
+    <string name="onboarding_storage_body">Indiquez combien d\'espace disque allouer aux vidéos. Quand plein, les plus anciennes seront supprimées automatiquement.</string>
+    <string name="onboarding_storage_unit">Go</string>
+    <string name="onboarding_permissions_title">Autorisations requises</string>
+    <string name="onboarding_permissions_body">DashCam a besoin de plusieurs autorisations pour fonctionner en arrière-plan.</string>
+    <string name="onboarding_start">Commencer l\'enregistrement</string>
+    <string name="onboarding_continue">Continuer</string>
+    <string name="onboarding_skip">Passer</string>
+
+    <string name="rec_start">Démarrer l\'enregistrement</string>
+    <string name="rec_stop">Arrêter l\'enregistrement</string>
+    <string name="rec_recording">Enregistrement</string>
+    <string name="rec_rotate">Pivoter l\'écran</string>
+    <string name="rec_switch_camera">Changer de caméra</string>
+
+    <string name="hud_speed">Vitesse</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">Distance</string>
+    <string name="hud_gforce">Force G</string>
+    <string name="hud_no_gps">Pas de signal GPS</string>
+
+    <string name="nav_camera">Caméra</string>
+    <string name="nav_trips">Trajets</string>
+    <string name="nav_reports">Rapports</string>
+    <string name="nav_transfer">Transfert</string>
+    <string name="nav_settings">Paramètres</string>
+
+    <string name="trips_title">Trajets enregistrés</string>
+    <string name="trips_empty">Aucun trajet enregistré.</string>
+    <string name="trips_delete">Supprimer le trajet</string>
+    <string name="trips_export_report">Générer le rapport PDF</string>
+
+    <string name="reports_title">Rapports d\'assurance</string>
+    <string name="reports_empty">Aucun rapport généré.</string>
+    <string name="reports_generate">Générer le rapport</string>
+    <string name="reports_share">Partager</string>
+    <string name="reports_open">Ouvrir</string>
+    <string name="reports_delete">Supprimer</string>
+    <string name="reports_generating">Génération du rapport PDF…</string>
+
+    <string name="transfer_title">Transfert WiFi</string>
+    <string name="transfer_start_server">Démarrer le serveur</string>
+    <string name="transfer_stop_server">Arrêter le serveur</string>
+    <string name="transfer_open_browser">Ouvrir dans le navigateur</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_section_recording">Enregistrement</string>
+    <string name="settings_section_storage">Stockage</string>
+    <string name="settings_section_sensors">Capteurs</string>
+    <string name="settings_section_about">À propos</string>
+    <string name="settings_video_quality">Qualité vidéo</string>
+    <string name="settings_segment_duration">Durée du segment</string>
+    <string name="settings_storage_limit">Limite de stockage</string>
+    <string name="settings_audio_enabled">Enregistrer l\'audio</string>
+    <string name="settings_gforce_threshold">Seuil de force G (g)</string>
+    <string name="settings_speed_unit">Unité de vitesse</string>
+    <string name="settings_auto_start">Démarrer lors du branchement du chargeur</string>
+    <string name="settings_keep_screen_on">Garder l\'écran allumé</string>
+
+    <string name="notif_recording_title">DashCam enregistre</string>
+    <string name="notif_event_title">Impact détecté</string>
+    <string name="notif_server_title">Serveur DashCam actif</string>
+
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_back">Retour</string>
+    <string name="action_close">Fermer</string>
+</resources>

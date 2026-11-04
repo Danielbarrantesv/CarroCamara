@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.danielbarrantesv.dashcam.data.prefs.AppLanguage
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
 import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
 import com.danielbarrantesv.dashcam.ui.theme.DashCamTypography
@@ -208,9 +209,19 @@ fun SettingsScreen(
         }
 
         item {
+            SectionHeader("Idioma")
+            SettingsCard {
+                LanguageRow(
+                    selected = state.language,
+                    onSelect = viewModel::setLanguage
+                )
+            }
+        }
+
+        item {
             SectionHeader("Acerca de")
             SettingsCard {
-                InfoRow("Versión", "1.0.2")
+                InfoRow("Versión", "1.0.3")
                 DividerLine()
                 InfoRow("Autor", "Daniel Barrantes")
                 DividerLine()
@@ -322,4 +333,48 @@ private fun DividerLine() {
         thickness = 0.5.dp,
         color = MaterialTheme.colorScheme.outlineVariant
     )
+}
+
+@Composable
+private fun LanguageRow(
+    selected: AppLanguage,
+    onSelect: (AppLanguage) -> Unit
+) {
+    Column(Modifier.padding(12.dp)) {
+        Text("Idioma de la app", style = DashCamTypography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            "Cambia el idioma. Se aplica inmediatamente.",
+            style = DashCamTypography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(12.dp))
+        // Grid of language buttons
+        AppLanguage.entries.chunked(3).forEach { row ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                row.forEach { lang ->
+                    val isSelected = lang == selected
+                    Button(
+                        onClick = { onSelect(lang) },
+                        modifier = Modifier.weight(1f).height(44.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isSelected) Primary else MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    ) {
+                        Text(
+                            lang.display,
+                            fontWeight = FontWeight.SemiBold,
+                            style = DashCamTypography.labelMedium
+                        )
+                    }
+                }
+                // Fill remaining slots if row is not full
+                repeat(3 - row.size) {
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+    }
 }

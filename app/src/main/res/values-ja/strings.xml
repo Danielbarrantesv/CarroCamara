@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">あなたの運転の証人</string>
+
+    <string name="onboarding_welcome_title">DashCamへようこそ</string>
+    <string name="onboarding_welcome_body">スマートフォンをプロのドライブレコーダーに変えましょう。ループ録画、GPSテレメトリ、保険会社用レポート。</string>
+    <string name="onboarding_storage_title">ストレージを設定</string>
+    <string name="onboarding_storage_body">動画に割り当てるディスク容量を指定します。一杯になると、最も古いものが自動的に削除されます。</string>
+    <string name="onboarding_storage_unit">GB</string>
+    <string name="onboarding_permissions_title">必要な権限</string>
+    <string name="onboarding_permissions_body">DashCamがバックグラウンドで動作するには複数の権限が必要です。</string>
+    <string name="onboarding_start">録画開始</string>
+    <string name="onboarding_continue">続ける</string>
+    <string name="onboarding_skip">スキップ</string>
+
+    <string name="rec_start">録画開始</string>
+    <string name="rec_stop">録画停止</string>
+    <string name="rec_recording">録画中</string>
+    <string name="rec_rotate">画面回転</string>
+    <string name="rec_switch_camera">カメラ切替</string>
+
+    <string name="hud_speed">速度</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">距離</string>
+    <string name="hud_gforce">G力</string>
+    <string name="hud_no_gps">GPS信号なし</string>
+
+    <string name="nav_camera">カメラ</string>
+    <string name="nav_trips">行程</string>
+    <string name="nav_reports">レポート</string>
+    <string name="nav_transfer">転送</string>
+    <string name="nav_settings">設定</string>
+
+    <string name="trips_title">録画された行程</string>
+    <string name="trips_empty">まだ録画された行程はありません。</string>
+    <string name="trips_delete">行程を削除</string>
+    <string name="trips_export_report">PDFレポートを生成</string>
+
+    <string name="reports_title">保険会社用レポート</string>
+    <string name="reports_empty">まだ生成されたレポートはありません。</string>
+    <string name="reports_generate">レポートを生成</string>
+    <string name="reports_share">共有</string>
+    <string name="reports_open">開く</string>
+    <string name="reports_delete">削除</string>
+    <string name="reports_generating">PDFレポートを生成中…</string>
+
+    <string name="transfer_title">WiFi転送</string>
+    <string name="transfer_start_server">サーバー開始</string>
+    <string name="transfer_stop_server">サーバー停止</string>
+    <string name="transfer_open_browser">ブラウザで開く</string>
+
+    <string name="settings_title">設定</string>
+    <string name="settings_section_recording">録画</string>
+    <string name="settings_section_storage">ストレージ</string>
+    <string name="settings_section_sensors">センサー</string>
+    <string name="settings_section_about">情報</string>
+    <string name="settings_video_quality">動画品質</string>
+    <string name="settings_segment_duration">セグメント時間</string>
+    <string name="settings_storage_limit">ストレージ制限</string>
+    <string name="settings_audio_enabled">音声を録音</string>
+    <string name="settings_gforce_threshold">G力しきい値 (g)</string>
+    <string name="settings_speed_unit">速度単位</string>
+    <string name="settings_auto_start">充電器接続時に開始</string>
+    <string name="settings_keep_screen_on">画面をオンのまま</string>
+
+    <string name="notif_recording_title">DashCam録画中</string>
+    <string name="notif_event_title">衝撃を検出</string>
+    <string name="notif_server_title">DashCamサーバー稼働中</string>
+
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_back">戻る</string>
+    <string name="action_close">閉じる</string>
+</resources>

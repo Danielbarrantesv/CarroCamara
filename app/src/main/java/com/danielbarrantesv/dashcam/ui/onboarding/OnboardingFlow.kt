@@ -1,5 +1,7 @@
 package com.danielbarrantesv.dashcam.ui.onboarding
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -21,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Mic
@@ -31,6 +34,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -97,6 +101,22 @@ fun OnboardingFlow(onFinish: () -> Unit) {
         ActivityResultContracts.RequestPermission()
     ) { _ -> /* regardless, continue */ }
 
+    var customStorageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // SAF folder picker for storage location
+    val storagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            customStorageUri = uri
+            try {
+                val flags = (Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                context.contentResolver.takePersistableUriPermission(uri, flags)
+            } catch (_: Exception) {}
+        }
+    }
+
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         when (step) {
             0 -> WelcomeStep(onContinue = { step = 1 })
@@ -109,7 +129,13 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                 onUnitChange = { unit = it },
                 onContinue = { step = 2 }
             )
-            2 -> PermissionsStep(
+            2 -> StorageFolderStep(
+                customUri = customStorageUri,
+                onPickFolder = { storagePicker.launch(null) },
+                onClearFolder = { customStorageUri = null },
+                onContinue = { step = 3 }
+            )
+            3 -> PermissionsStep(
                 permissionsState = permissionsState,
                 onBackgroundLocationRequest = {
                     bgLocationLauncher.launch(Permissions.backgroundLocation)
@@ -120,10 +146,12 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                     val storageFinalGb = storageGb.toInt()
                     val qualityFinal = quality
                     val unitFinal = unit
+                    val finalUri = customStorageUri
                     MainScope().launch {
                         prefs.setStorageLimitGb(storageFinalGb)
                         prefs.setVideoQuality(qualityFinal)
                         prefs.setSpeedUnit(unitFinal)
+                        prefs.setStorageUri(finalUri?.toString())
                         prefs.setOnboardingComplete()
                         onFinish()
                     }
@@ -260,6 +288,106 @@ private fun StorageStep(
                         onClick = { onUnitChange(u) },
                         modifier = Modifier.weight(1f)
                     )
+                }
+            }
+        }
+
+        Button(
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+        ) {
+            Text("Continuar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
+        }
+    }
+}
+
+@Composable
+private fun StorageFolderStep(
+    customUri: Uri?,
+    onPickFolder: () -> Unit,
+    onClearFolder: () -> Unit,
+    onContinue: () -> Unit
+) {
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Text(
+                "Carpeta de videos",
+                style = DashCamTypography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "Selecciona dónde quieres que se guarden los videos grabados. Puedes usar el almacenamiento de la app o elegir una carpeta personalizada (recomendado: una carpeta en el almacenamiento interno o una tarjeta SD).",
+                style = DashCamTypography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(32.dp))
+
+            // Current selection card
+            Card(
+                Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (customUri != null)
+                        MaterialTheme.colorScheme.surfaceVariant
+                    else MaterialTheme.colorScheme.surface
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Filled.Folder,
+                            contentDescription = null,
+                            tint = Primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                if (customUri != null) "Carpeta personalizada" else "Carpeta por defecto",
+                                style = DashCamTypography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                if (customUri != null)
+                                    customUri.toString().let {
+                                        if (it.length > 60) "…" + it.takeLast(60) else it
+                                    }
+                                else "Almacenamiento de la app (no accesible desde otras apps)",
+                                style = DashCamTypography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        if (customUri != null) {
+                            Icon(
+                                Icons.Filled.Check,
+                                contentDescription = null,
+                                tint = Success,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = onPickFolder,
+                    modifier = Modifier.weight(1f).height(48.dp)
+                ) { Text("Elegir carpeta", style = DashCamTypography.labelMedium) }
+                if (customUri != null) {
+                    OutlinedButton(
+                        onClick = onClearFolder,
+                        modifier = Modifier.weight(1f).height(48.dp)
+                    ) { Text("Usar por defecto", style = DashCamTypography.labelMedium) }
                 }
             }
         }

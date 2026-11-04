@@ -3,8 +3,11 @@ package com.danielbarrantesv.dashcam.ui.settings
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danielbarrantesv.dashcam.data.prefs.AppLanguage
 import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
 import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
@@ -30,7 +33,8 @@ data class SettingsUiState(
     val storageUri: String? = null,
     val storageDescription: String = "",
     val dualCameraEnabled: Boolean = false,
-    val defaultLens: Int = 0
+    val defaultLens: Int = 0,
+    val language: AppLanguage = AppLanguage.ES
 )
 
 @HiltViewModel
@@ -43,8 +47,9 @@ class SettingsViewModel @Inject constructor(
         combine(repo.audioEnabled, repo.videoQuality, repo.segmentDurationSec) { a, b, c -> Triple(a, b, c) },
         combine(repo.storageLimitGb, repo.gforceThreshold, repo.speedUnit) { a, b, c -> Triple(a, b, c) },
         combine(repo.autoStartOnPower, repo.keepScreenOn, repo.dualCameraEnabled, repo.defaultLens) { a, b, c, d -> listOf(a, b, c, d) },
-        combine(repo.storageUri, repo.storageUri) { uri, _ -> uri } // stream storageUri as flow
-    ) { rec, sens, other, storageUri ->
+        combine(repo.storageUri, repo.language) { uri, lang -> uri to lang }
+    ) { rec, sens, other, storageAndLang ->
+        val (storageUri, lang) = storageAndLang
         SettingsUiState(
             audioEnabled = rec.first,
             videoQuality = rec.second,
@@ -58,7 +63,8 @@ class SettingsViewModel @Inject constructor(
             defaultLens = other[3] as Int,
             storageUri = storageUri,
             storageDescription = storageUri?.let { describeUri(it) }
-                ?: FileUtils.defaultStorageDescription(ctx)
+                ?: FileUtils.defaultStorageDescription(ctx),
+            language = lang
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SettingsUiState())
 
@@ -97,5 +103,11 @@ class SettingsViewModel @Inject constructor(
 
     fun resetStorageUri() = viewModelScope.launch {
         repo.setStorageUri(null)
+    }
+
+    fun setLanguage(lang: AppLanguage) = viewModelScope.launch {
+        repo.setLanguage(lang)
+        // Apply immediately via AppCompatDelegate (works without restarting the app)
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang.tag))
     }
 }
