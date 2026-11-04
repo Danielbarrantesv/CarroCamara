@@ -146,4 +146,12 @@
     <string name="action_cancel">Abbrechen</string>
     <string name="action_back">Zurück</string>
     <string name="action_close">Schließen</string>
+
+
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">Dein Gerät unterstützt keine Doppelkamera-Aufnahme. Es wird nur die ausgewählte Kamera verwendet.</string>
+    <string name="camera_preview_unavailable">Vorschau auf dieser Kamera nicht verfügbar. Aufnahme funktioniert ohne Vorschau.</string>
+    <string name="camera_open_error">Kamera konnte nicht geöffnet werden: %1$s</string>
+    <string name="camera_not_ready">Kamera nicht bereit. Schließe und öffne die App erneut.</string>
+    <string name="camera_permission_denied">Kamera-Berechtigung nicht gewährt</string>
 </resources>

@@ -146,4 +146,12 @@
     <string name="action_cancel">キャンセル</string>
     <string name="action_back">戻る</string>
     <string name="action_close">閉じる</string>
+
+
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">お使いのデバイスはデュアルカメラ録画に対応していません。選択したカメラのみが使用されます。</string>
+    <string name="camera_preview_unavailable">このカメラではプレビューできません。プレビューなしで録画されます。</string>
+    <string name="camera_open_error">カメラを開けませんでした: %1$s</string>
+    <string name="camera_not_ready">カメラの準備ができていません。アプリを閉じて再度開いてください。</string>
+    <string name="camera_permission_denied">カメラの権限が付与されていません</string>
 </resources>

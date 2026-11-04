@@ -146,4 +146,12 @@
     <string name="action_cancel">取消</string>
     <string name="action_back">返回</string>
     <string name="action_close">关闭</string>
+
+
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">您的设备不支持双摄像头录制。将仅使用选定的摄像头。</string>
+    <string name="camera_preview_unavailable">此摄像头无法预览。录制将在没有预览的情况下工作。</string>
+    <string name="camera_open_error">无法打开摄像头：%1$s</string>
+    <string name="camera_not_ready">摄像头未就绪。关闭并重新打开应用。</string>
+    <string name="camera_permission_denied">未授予摄像头权限</string>
 </resources>

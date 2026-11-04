@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -68,6 +69,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -82,8 +84,17 @@ fun OnboardingFlow(onFinish: () -> Unit) {
     val context = LocalContext.current
     var step by remember { mutableIntStateOf(0) }
 
-    // Selected language (default: Spanish)
+    // Selected language (default: Spanish, but load persisted value after recreate)
     var selectedLanguage by remember { mutableStateOf(com.danielbarrantesv.dashcam.data.prefs.AppLanguage.ES) }
+
+    // After a recreate (triggered by language change), load the persisted language
+    // so the highlight shows on the correct button.
+    LaunchedEffect(Unit) {
+        try {
+            val prefs = SettingsRepository(context)
+            selectedLanguage = prefs.language.first()
+        } catch (_: Exception) {}
+    }
 
     // Permissions state
     val permissionsState = rememberMultiplePermissionsState(
@@ -192,7 +203,7 @@ private fun LanguageStep(
     onContinue: () -> Unit
 ) {
     Column(
-        Modifier.fillMaxSize().padding(24.dp),
+        Modifier.fillMaxSize().navigationBarsPadding().padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -244,7 +255,7 @@ private fun LanguageStep(
 @Composable
 private fun WelcomeStep(onContinue: () -> Unit) {
     Column(
-        Modifier.fillMaxSize().padding(32.dp),
+        Modifier.fillMaxSize().navigationBarsPadding().padding(32.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -306,7 +317,7 @@ private fun StorageStep(
     onContinue: () -> Unit
 ) {
     Column(
-        Modifier.fillMaxSize().padding(24.dp),
+        Modifier.fillMaxSize().navigationBarsPadding().padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -377,7 +388,7 @@ private fun StorageStep(
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Primary)
         ) {
-            Text("Continuar", color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.onboarding_continue), color = Color.Black, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
         }
@@ -392,7 +403,7 @@ private fun StorageFolderStep(
     onContinue: () -> Unit
 ) {
     Column(
-        Modifier.fillMaxSize().padding(24.dp),
+        Modifier.fillMaxSize().navigationBarsPadding().padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -507,7 +518,7 @@ private fun PermissionsStep(
     val context = LocalContext.current
 
     Column(
-        Modifier.fillMaxSize().padding(24.dp),
+        Modifier.fillMaxSize().navigationBarsPadding().padding(24.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {

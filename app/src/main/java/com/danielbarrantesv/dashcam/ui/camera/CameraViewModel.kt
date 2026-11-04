@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danielbarrantesv.dashcam.R
 import com.danielbarrantesv.dashcam.data.model.GForceEventEntity
 import com.danielbarrantesv.dashcam.data.model.GpsSampleEntity
 import com.danielbarrantesv.dashcam.data.model.VideoSegmentEntity
@@ -135,7 +136,7 @@ class CameraViewModel @Inject constructor(
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            _state.value = _state.value.copy(error = "Permiso de cámara no concedido")
+            _state.value = _state.value.copy(error = ctx.getString(R.string.camera_permission_denied))
             return
         }
 
@@ -154,11 +155,9 @@ class CameraViewModel @Inject constructor(
                 val provider = getCameraProvider(ctx)
                 cameraProvider = provider
 
-                val preview = Preview.Builder()
-                    .setTargetAspectRatio(AspectRatio.RATIO_16_9)
-                    .build().also { p ->
-                        p.setSurfaceProvider(previewView.surfaceProvider)
-                    }
+                val preview = Preview.Builder().build().also { p ->
+                    p.setSurfaceProvider(previewView.surfaceProvider)
+                }
                 previewUseCase = preview
 
                 val quality = settings.videoQuality.first()
@@ -179,8 +178,7 @@ class CameraViewModel @Inject constructor(
 
                 if (dualRequested && !concurrentSupported) {
                     _state.value = _state.value.copy(
-                        error = "Tu dispositivo no soporta grabación con doble cámara. " +
-                            "Se grabará solo con la cámara seleccionada."
+                        error = ctx.getString(R.string.camera_dual_not_supported)
                     )
                 }
 
@@ -252,8 +250,7 @@ class CameraViewModel @Inject constructor(
                             provider.bindToLifecycle(lifecycleOwner, selector, capture)
                             primaryCapture = capture
                             _state.value = _state.value.copy(
-                                error = "Vista previa no disponible en esta cámara. " +
-                                    "Grabación funcionará sin preview."
+                                error = ctx.getString(R.string.camera_preview_unavailable)
                             )
                         } catch (e2: Exception) {
                             // Final fallback: HD quality
@@ -270,8 +267,7 @@ class CameraViewModel @Inject constructor(
                 startGpsStream()
             } catch (e: Exception) {
                 Log.e(TAG, "bindCamera failed", e)
-                _state.value = _state.value.copy(
-                    error = "No se pudo abrir la cámara: ${e.message}",
+                _state.value = _state.value.copy(error = ctx.getString(R.string.camera_open_error, e.message),
                     isCameraBound = false
                 )
             }
@@ -331,7 +327,7 @@ class CameraViewModel @Inject constructor(
 
     private fun startRecording() {
         val capture = primaryCapture ?: run {
-            _state.value = _state.value.copy(error = "Cámara no lista. Cierra y abre la app.")
+            _state.value = _state.value.copy(error = ctx.getString(R.string.camera_not_ready))
             return
         }
 

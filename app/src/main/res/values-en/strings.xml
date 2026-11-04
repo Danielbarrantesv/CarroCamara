@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">DashCam</string>
     <string name="app_tagline">Your road witness</string>
-
     <!-- Onboarding -->
     <string name="onboarding_welcome_title">Welcome to DashCam</string>
     <string name="onboarding_welcome_body">Turn your phone into a professional dashcam. Loop recording, GPS telemetry, and reports for your insurer.</string>
@@ -13,7 +12,6 @@
     <string name="onboarding_start">Start recording</string>
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_skip">Skip</string>
-
     <!-- Onboarding: language + folder steps -->
     <string name="onboarding_language_title">Select your language</string>
     <string name="onboarding_language_subtitle">Choose the app language</string>
@@ -25,12 +23,10 @@
     <string name="onboarding_folder_default_desc">App storage (not accessible from other apps)</string>
     <string name="onboarding_folder_pick">Choose folder</string>
     <string name="onboarding_folder_use_default">Use default</string>
-
     <!-- Onboarding: welcome -->
     <string name="onboarding_welcome_app_name">DashCam</string>
     <string name="onboarding_welcome_tagline">Your road witness</string>
     <string name="onboarding_welcome_button">Start</string>
-
     <!-- Onboarding: permissions -->
     <string name="onboarding_perm_camera_title">Camera</string>
     <string name="onboarding_perm_camera_desc">To record video</string>
@@ -45,44 +41,36 @@
     <string name="onboarding_perm_grant_button">Grant permissions</string>
     <string name="onboarding_perm_bg_location_button">Request background location</string>
     <string name="onboarding_perm_bg_location_hint">For background location, after granting location, you must request it separately.</string>
-
     <string name="onboarding_storage_quality_title">Video quality</string>
     <string name="onboarding_storage_unit_title">Speed unit</string>
     <string name="onboarding_storage_minutes_hint">min of video at 1080p</string>
-
     <!-- Settings: sections -->
     <string name="settings_section_camera">Camera</string>
     <string name="settings_section_others">Others</string>
     <string name="settings_section_permissions">Permissions</string>
     <string name="settings_section_language">Language</string>
-
     <!-- Settings: camera -->
     <string name="settings_default_lens">Default camera</string>
     <string name="settings_default_lens_back">Back</string>
     <string name="settings_default_lens_front">Front</string>
     <string name="settings_dual_camera">Dual camera</string>
     <string name="settings_dual_camera_desc">Record with front and back camera at once (coming soon)</string>
-
     <!-- Settings: storage -->
     <string name="settings_videos_folder">Videos folder</string>
     <string name="settings_change_location">Change location</string>
     <string name="settings_reset">Reset</string>
-
     <!-- Settings: others -->
     <string name="settings_auto_start_desc">Starts recording automatically</string>
     <string name="settings_keep_screen_on_desc">Keeps screen on while recording</string>
     <string name="settings_audio_desc">Microphone during recording</string>
-
     <!-- Settings: language -->
     <string name="settings_language_title">App language</string>
     <string name="settings_language_desc">Change the language. Applied immediately.</string>
-
     <!-- Settings: about -->
     <string name="settings_about_version_label">Version</string>
     <string name="settings_about_author_label">Author</string>
     <string name="settings_about_repo_label">Repository</string>
     <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
-
     <!-- Settings: permissions -->
     <string name="perm_camera_title">Camera</string>
     <string name="perm_camera_desc">Required to record video</string>
@@ -97,7 +85,6 @@
     <string name="perm_grant">Grant</string>
     <string name="perm_open_settings">Settings</string>
     <string name="perm_granted">Granted</string>
-
     <!-- Recording -->
     <string name="rec_start">Start recording</string>
     <string name="rec_stop">Stop recording</string>
@@ -111,7 +98,6 @@
     <string name="rec_duration">Duration</string>
     <string name="rec_segment">Current segment</string>
     <string name="rec_storage_used">Storage used</string>
-
     <!-- HUD -->
     <string name="hud_speed">Speed</string>
     <string name="hud_speed_unit">km/h</string>
@@ -123,14 +109,12 @@
     <string name="hud_altitude_unit">m</string>
     <string name="hud_heading">Heading</string>
     <string name="hud_no_gps">No GPS signal</string>
-
     <!-- Bottom nav -->
     <string name="nav_camera">Camera</string>
     <string name="nav_trips">Trips</string>
     <string name="nav_reports">Reports</string>
     <string name="nav_transfer">Transfer</string>
     <string name="nav_settings">Settings</string>
-
     <!-- Trips -->
     <string name="trips_title">Recorded trips</string>
     <string name="trips_empty">No trips recorded yet.</string>
@@ -141,7 +125,6 @@
     <string name="trips_events">Events</string>
     <string name="trips_delete">Delete trip</string>
     <string name="trips_export_report">Generate PDF report</string>
-
     <!-- Reports -->
     <string name="reports_title">Insurer reports</string>
     <string name="reports_empty">No reports generated yet.</string>
@@ -150,7 +133,6 @@
     <string name="reports_open">Open</string>
     <string name="reports_delete">Delete</string>
     <string name="reports_generating">Generating PDF report…</string>
-
     <!-- Transfer -->
     <string name="transfer_title">WiFi transfer</string>
     <string name="transfer_start_server">Start server</string>
@@ -162,7 +144,6 @@
     <string name="transfer_videos">Available videos</string>
     <string name="transfer_reports">Available reports</string>
     <string name="transfer_no_wifi">Connect to a WiFi network to use this feature.</string>
-
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_section_recording">Recording</string>
@@ -180,7 +161,6 @@
     <string name="settings_about_version">Version</string>
     <string name="settings_about_author">Author</string>
     <string name="settings_about_repo">Repository</string>
-
     <!-- Notifications -->
     <string name="notif_channel_recording">Recording in progress</string>
     <string name="notif_channel_recording_desc">Persistent notification while DashCam records in background.</string>
@@ -194,14 +174,12 @@
     <string name="notif_event_text">G-force: %1$.2f g — Event saved</string>
     <string name="notif_server_title">DashCam server active</string>
     <string name="notif_server_text">Available at %1$s</string>
-
     <!-- Errors -->
     <string name="error_camera_unavailable">Could not access the camera.</string>
     <string name="error_storage_full">Storage full. Free space or adjust the limit in Settings.</string>
     <string name="error_gps_unavailable">GPS unavailable. Make sure it\'s enabled.</string>
     <string name="error_report_generation">Could not generate the PDF report.</string>
     <string name="error_server_start">Could not start the server. Check WiFi.</string>
-
     <!-- Common -->
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
@@ -214,4 +192,10 @@
     <string name="content_desc_photo">Photo capture button</string>
     <string name="content_desc_rotate">Rotate screen</string>
     <string name="content_desc_switch">Switch camera</string>
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">Your device does not support dual camera recording. Only the selected camera will be used.</string>
+    <string name="camera_preview_unavailable">Preview not available on this camera. Recording will work without preview.</string>
+    <string name="camera_open_error">Could not open camera: %1$s</string>
+    <string name="camera_not_ready">Camera not ready. Close and reopen the app.</string>
+    <string name="camera_permission_denied">Camera permission not granted</string>
 </resources>

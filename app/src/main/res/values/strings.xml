@@ -85,6 +85,13 @@
     <string name="settings_about_repo_label">Repositorio</string>
     <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
 
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">Tu dispositivo no soporta grabación con doble cámara. Se grabará solo con la cámara seleccionada.</string>
+    <string name="camera_preview_unavailable">Vista previa no disponible en esta cámara. La grabación funcionará sin vista previa.</string>
+    <string name="camera_open_error">No se pudo abrir la cámara: %1$s</string>
+    <string name="camera_not_ready">Cámara no lista. Cierra y abre la app.</string>
+    <string name="camera_permission_denied">Permiso de cámara no concedido</string>
+
     <!-- Settings: permissions -->
     <string name="perm_camera_title">Cámara</string>
     <string name="perm_camera_desc">Necesario para grabar video</string>

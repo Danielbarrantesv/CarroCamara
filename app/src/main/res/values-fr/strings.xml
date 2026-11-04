@@ -155,4 +155,12 @@
     <string name="action_cancel">Annuler</string>
     <string name="action_back">Retour</string>
     <string name="action_close">Fermer</string>
+
+
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">Votre appareil ne prend pas en charge l\'enregistrement double caméra. Seule la caméra sélectionnée sera utilisée.</string>
+    <string name="camera_preview_unavailable">Aperçu non disponible sur cette caméra. L\'enregistrement fonctionnera sans aperçu.</string>
+    <string name="camera_open_error">Impossible d\'ouvrir la caméra: %1$s</string>
+    <string name="camera_not_ready">Caméra non prête. Fermez et rouvrez l\'app.</string>
+    <string name="camera_permission_denied">Autorisation de caméra non accordée</string>
 </resources>
