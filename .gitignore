@@ -26,6 +26,9 @@ captures/
 # Logs
 *.log
 
+# User uploads (don't commit)
+upload/
+
 # OS / editor
 .DS_Store
 Thumbs.db
