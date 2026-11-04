@@ -44,11 +44,17 @@ workRuntime = "2.10.0"
 # Media
 exifInterface = "1.3.7"
 
+# DocumentFile (SAF)
+documentfile = "1.0.1"
+
 # Splash
 splashscreen = "1.0.1"
 
 # Accompanist (permissions)
 accompanistPermissions = "0.36.0"
+
+# Media3 (video playback)
+media3 = "1.4.1"
 
 [libraries]
 # AndroidX core
@@ -119,8 +125,16 @@ androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx"
 # ExifInterface (for photo metadata)
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifInterface" }
 
+# DocumentFile (SAF)
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
+
 # Accompanist permissions
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+
+# Media3 (video playback)
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
+androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

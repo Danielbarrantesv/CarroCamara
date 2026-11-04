@@ -56,13 +56,14 @@ data class CameraUiState(
     val maxSpeedKmh: Float = 0f,
     val avgSpeedKmh: Float = 0f,
     val speedUnit: String = "km/h",
-    val lensFacing: Int = 0, // 0 = back, 1 = front
+    val lensFacing: Int = CameraSelector.LENS_FACING_BACK,
     val rotationLocked: Boolean = false,
     val currentSegmentIndex: Int = 0,
     val storageUsedBytes: Long = 0,
     val startedAt: Long = 0,
     val error: String? = null,
-    val lastEventLabel: String? = null
+    val lastEventLabel: String? = null,
+    val dualCameraEnabled: Boolean = false
 )
 
 @HiltViewModel
@@ -79,7 +80,6 @@ class CameraViewModel @Inject constructor(
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var videoCapture: VideoCapture<Recorder>? = null
-    private var previewUseCase: Preview? = null
     private var activeRecording: Recording? = null
 
     private var currentTripId: Long = 0L
@@ -92,9 +92,20 @@ class CameraViewModel @Inject constructor(
     private var gForceJob: Job? = null
 
     init {
+        // Load default lens + speed unit + dual camera setting
+        viewModelScope.launch {
+            settings.defaultLens.collect { lens ->
+                _state.value = _state.value.copy(lensFacing = lens)
+            }
+        }
         viewModelScope.launch {
             settings.speedUnit.collect { u: SpeedUnit ->
                 _state.value = _state.value.copy(speedUnit = u.label)
+            }
+        }
+        viewModelScope.launch {
+            settings.dualCameraEnabled.collect { enabled ->
+                _state.value = _state.value.copy(dualCameraEnabled = enabled)
             }
         }
     }
@@ -104,7 +115,6 @@ class CameraViewModel @Inject constructor(
      * the preview onto [previewView]. Called from CameraScreen's LaunchedEffect.
      */
     fun bindCamera(lifecycleOwner: LifecycleOwner, previewView: PreviewView) {
-        // Permission check
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -120,7 +130,6 @@ class CameraViewModel @Inject constructor(
                 val preview = Preview.Builder().build().also { p ->
                     p.setSurfaceProvider(previewView.surfaceProvider)
                 }
-                previewUseCase = preview
 
                 val quality = settings.videoQuality.first()
                 val recorder = Recorder.Builder()
@@ -147,11 +156,13 @@ class CameraViewModel @Inject constructor(
 
                 _state.value = _state.value.copy(isCameraBound = true, error = null)
 
-                // Start GPS stream for HUD (independent of recording)
                 startGpsStream()
             } catch (e: Exception) {
                 Log.e(TAG, "bindCamera failed", e)
-                _state.value = _state.value.copy(error = "Cámara: ${e.message}")
+                _state.value = _state.value.copy(
+                    error = "No se pudo abrir la cámara: ${e.message}",
+                    isCameraBound = false
+                )
             }
         }
     }
@@ -166,7 +177,7 @@ class CameraViewModel @Inject constructor(
 
     private fun startRecording() {
         val capture = videoCapture ?: run {
-            _state.value = _state.value.copy(error = "Cámara no lista")
+            _state.value = _state.value.copy(error = "Cámara no lista. Cierra y abre la app.")
             return
         }
 
@@ -186,7 +197,8 @@ class CameraViewModel @Inject constructor(
                     maxSpeedKmh = 0f,
                     avgSpeedKmh = 0f,
                     gForce = 0f,
-                    error = null
+                    error = null,
+                    lastEventLabel = null
                 )
 
                 startNextSegment(audioEnabled)
@@ -194,7 +206,7 @@ class CameraViewModel @Inject constructor(
                 startGForceStream()
             } catch (e: Exception) {
                 Log.e(TAG, "startRecording failed", e)
-                _state.value = _state.value.copy(error = "Grabación: ${e.message}")
+                _state.value = _state.value.copy(error = "No se pudo iniciar: ${e.message}")
             }
         }
     }
@@ -206,7 +218,6 @@ class CameraViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                // Storage management — delete oldest unprotected segments if over limit
                 val limitGb = settings.storageLimitGb.first()
                 val limitBytes = limitGb.toLong() * 1_073_741_824L
                 var used = tripRepo.totalVideoSizeBytes()
@@ -272,7 +283,13 @@ class CameraViewModel @Inject constructor(
                     }
                 } else {
                     Log.e(TAG, "Finalize error: ${event.cause}")
-                    _state.value = _state.value.copy(error = "Error video: ${event.cause?.message}")
+                    // Don't propagate "Recording stopped" when user leaves app
+                    val cause = event.cause
+                    if (cause != null && _state.value.isRecording) {
+                        _state.value = _state.value.copy(
+                            error = "Grabación interrumpida: ${cause.message ?: "error desconocido"}"
+                        )
+                    }
                 }
             }
         }
@@ -387,7 +404,9 @@ class CameraViewModel @Inject constructor(
     }
 
     private fun stopRecording() {
-        activeRecording?.stop()
+        try {
+            activeRecording?.stop()
+        } catch (_: Exception) {}
         activeRecording = null
         timerJob?.cancel()
         gForceJob?.cancel()
@@ -419,20 +438,44 @@ class CameraViewModel @Inject constructor(
                 isRecording = false,
                 durationSec = 0,
                 currentSegmentIndex = 0,
-                lastEventLabel = null
+                lastEventLabel = null,
+                error = null
             )
             segmentIndex = 0
             currentTripId = 0L
         }
     }
 
+    /**
+     * Called when the user leaves the screen (onDispose/onCleared).
+     * Stops the recording gracefully without showing an error.
+     */
+    fun cleanup() {
+        if (_state.value.isRecording) {
+            stopRecording()
+        }
+        timerJob?.cancel()
+        gpsJob?.cancel()
+        gForceJob?.cancel()
+        try {
+            activeRecording?.stop()
+        } catch (_: Exception) {}
+        activeRecording = null
+    }
+
     fun toggleLens() {
-        // Don't allow lens switch during recording (would interrupt segments)
         if (_state.value.isRecording) return
+        val newLens = if (_state.value.lensFacing == CameraSelector.LENS_FACING_BACK) {
+            CameraSelector.LENS_FACING_FRONT
+        } else {
+            CameraSelector.LENS_FACING_BACK
+        }
         _state.value = _state.value.copy(
-            lensFacing = if (_state.value.lensFacing == 0) 1 else 0,
+            lensFacing = newLens,
             isCameraBound = false
         )
+        // Persist as new default
+        viewModelScope.launch { settings.setDefaultLens(newLens) }
     }
 
     fun toggleRotationLock() {
@@ -441,12 +484,13 @@ class CameraViewModel @Inject constructor(
         )
     }
 
+    fun clearError() {
+        _state.value = _state.value.copy(error = null)
+    }
+
     override fun onCleared() {
         super.onCleared()
-        activeRecording?.stop()
-        timerJob?.cancel()
-        gpsJob?.cancel()
-        gForceJob?.cancel()
+        cleanup()
     }
 
     private fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {

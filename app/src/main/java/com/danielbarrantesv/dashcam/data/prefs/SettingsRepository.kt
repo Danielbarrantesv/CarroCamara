@@ -1,6 +1,7 @@
 package com.danielbarrantesv.dashcam.data.prefs
 
 import android.content.Context
+import android.net.Uri
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
@@ -51,6 +52,9 @@ class SettingsRepository @Inject constructor(
         val AUTO_START_ON_POWER = booleanPreferencesKey("auto_start_on_power")
         val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
         val LAST_TRIP_ID = intPreferencesKey("last_trip_id")
+        val STORAGE_URI = stringPreferencesKey("storage_uri")
+        val DUAL_CAMERA = booleanPreferencesKey("dual_camera")
+        val DEFAULT_LENS = intPreferencesKey("default_lens") // 0 = back, 1 = front
     }
 
     val hasCompletedOnboarding: Flow<Boolean> =
@@ -112,4 +116,27 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setLastTripId(id: Long) =
         ctx.dataStore.edit { it[Keys.LAST_TRIP_ID] = id.toInt() }
+
+    // ---- Custom storage location (SAF tree URI) ----
+    val storageUri: Flow<String?> =
+        ctx.dataStore.data.map { it[Keys.STORAGE_URI] }
+
+    suspend fun setStorageUri(uri: String?) =
+        ctx.dataStore.edit {
+            if (uri == null) it.remove(Keys.STORAGE_URI) else it[Keys.STORAGE_URI] = uri
+        }
+
+    // ---- Dual camera (front + back simultaneously) ----
+    val dualCameraEnabled: Flow<Boolean> =
+        ctx.dataStore.data.map { it[Keys.DUAL_CAMERA] ?: false }
+
+    suspend fun setDualCameraEnabled(v: Boolean) =
+        ctx.dataStore.edit { it[Keys.DUAL_CAMERA] = v }
+
+    // ---- Default lens (0 = back, 1 = front) ----
+    val defaultLens: Flow<Int> =
+        ctx.dataStore.data.map { it[Keys.DEFAULT_LENS] ?: 0 }
+
+    suspend fun setDefaultLens(lens: Int) =
+        ctx.dataStore.edit { it[Keys.DEFAULT_LENS] = lens.coerceIn(0, 1) }
 }

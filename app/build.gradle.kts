@@ -137,6 +137,14 @@ dependencies {
     // ExifInterface
     implementation(libs.androidx.exifinterface)
 
+    // DocumentFile (SAF)
+    implementation(libs.androidx.documentfile)
+
     // Accompanist permissions
     implementation(libs.accompanist.permissions)
+
+    // Media3 (video playback)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.common)
 }

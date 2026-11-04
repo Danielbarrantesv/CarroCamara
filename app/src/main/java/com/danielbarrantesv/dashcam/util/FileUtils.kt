@@ -2,12 +2,16 @@ package com.danielbarrantesv.dashcam.util
 
 import android.content.Context
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.core.content.FileProvider
+import androidx.documentfile.provider.DocumentFile
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 /**
  * File helpers for videos, photos, reports, exports.
- * All under app-specific external storage (no MANAGE_EXTERNAL_STORAGE needed).
+ * Supports default app-specific storage and custom SAF locations.
  */
 object FileUtils {
 
@@ -56,4 +60,65 @@ object FileUtils {
         bytes >= 1024 -> "%.1f KB".format(bytes / 1024.0)
         else -> "$bytes B"
     }
+
+    /** Human-readable description of the default storage location. */
+    fun defaultStorageDescription(ctx: Context): String {
+        val dir = ctx.getExternalFilesDir(null)
+        return "Almacenamiento de la app\n${dir?.absolutePath ?: "(desconocido)"}"
+    }
+
+    // ============ Custom SAF storage ============
+
+    /**
+     * Lists all .mp4 files in the SAF tree identified by [treeUri].
+     * Returns a list of (uri, name, size, modified).
+     */
+    data class SafVideo(
+        val uri: Uri,
+        val name: String,
+        val size: Long,
+        val modified: Long
+    )
+
+    fun listSafVideos(ctx: Context, treeUri: Uri): List<SafVideo> {
+        val tree = DocumentFile.fromTreeUri(ctx, treeUri) ?: return emptyList()
+        return tree.listFiles()
+            .filter { it.isFile && it.name?.endsWith(".mp4", ignoreCase = true) == true }
+            .sortedByDescending { it.lastModified() }
+            .map {
+                SafVideo(it.uri, it.name ?: "?", it.length(), it.lastModified())
+            }
+    }
+
+    /** Delete a single SAF file by uri. Returns true on success. */
+    fun deleteSafFile(ctx: Context, uri: Uri): Boolean {
+        return try {
+            val docFile = DocumentFile.fromSingleUri(ctx, uri)
+            docFile?.delete() ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Copy a video file (File) produced by CameraX into a SAF tree.
+     * Used when the user picks a custom storage location.
+     */
+    fun copyFileToSaf(ctx: Context, source: File, treeUri: Uri, displayName: String): Uri? {
+        return try {
+            val tree = DocumentFile.fromTreeUri(ctx, treeUri) ?: return null
+            val target = tree.createFile("video/mp4", displayName) ?: return null
+            ctx.contentResolver.openOutputStream(target.uri)?.use { out ->
+                FileInputStream(source).use { input ->
+                    input.copyTo(out)
+                }
+            }
+            // Remove local file after successful copy
+            source.delete()
+            target.uri
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
+

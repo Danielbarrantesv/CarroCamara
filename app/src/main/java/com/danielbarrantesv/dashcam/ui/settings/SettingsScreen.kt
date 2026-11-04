@@ -1,5 +1,9 @@
 package com.danielbarrantesv.dashcam.ui.settings
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,16 +16,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,6 +52,19 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // SAF picker launcher
+    val storagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            // Persist permission so we can access it across sessions
+            try {
+                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                viewModel.setStorageUri(uri)
+            } catch (_: Exception) {}
+        }
+    }
 
     LazyColumn(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
@@ -72,8 +101,60 @@ fun SettingsScreen(
         }
 
         item {
+            SectionHeader("Cámara")
+            SettingsCard {
+                QualityRow(
+                    title = "Cámara por defecto",
+                    subtitle = if (state.defaultLens == 0) "Trasera" else "Frontal",
+                    options = listOf("Trasera" to 0, "Frontal" to 1),
+                    selected = state.defaultLens,
+                    onSelect = viewModel::setDefaultLens
+                )
+                DividerLine()
+                ToggleRow(
+                    title = "Doble cámara",
+                    subtitle = "Grabar con cámara frontal y trasera a la vez (próximamente)",
+                    checked = state.dualCameraEnabled,
+                    onCheckedChange = viewModel::setDualCamera
+                )
+            }
+        }
+
+        item {
             SectionHeader("Almacenamiento")
             SettingsCard {
+                Column(Modifier.padding(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Filled.Folder,
+                            contentDescription = null,
+                            tint = Primary,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text("Carpeta de videos", style = DashCamTypography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        state.storageDescription,
+                        style = DashCamTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(
+                            onClick = { storagePicker.launch(null) },
+                            modifier = Modifier.weight(1f).height(44.dp)
+                        ) { Text("Cambiar ubicación", style = DashCamTypography.labelMedium) }
+                        if (state.storageUri != null) {
+                            OutlinedButton(
+                                onClick = { viewModel.resetStorageUri() },
+                                modifier = Modifier.weight(1f).height(44.dp)
+                            ) { Text("Restablecer", style = DashCamTypography.labelMedium) }
+                        }
+                    }
+                }
+                DividerLine()
                 SliderRow(
                     title = "Límite de almacenamiento",
                     valueText = "${state.storageLimitGb} GB",
@@ -129,7 +210,7 @@ fun SettingsScreen(
         item {
             SectionHeader("Acerca de")
             SettingsCard {
-                InfoRow("Versión", "1.0.0")
+                InfoRow("Versión", "1.0.2")
                 DividerLine()
                 InfoRow("Autor", "Daniel Barrantes")
                 DividerLine()
@@ -191,13 +272,13 @@ private fun <T> QualityRow(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             options.forEach { (label, value) ->
                 val isSelected = value == selected
-                androidx.compose.material3.Button(
+                Button(
                     onClick = { onSelect(value) },
                     modifier = Modifier.weight(1f).height(40.dp),
                     shape = RoundedCornerShape(10.dp),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = if (isSelected) Primary else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (isSelected) androidx.compose.ui.graphics.Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
+                        contentColor = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) { Text(label, fontWeight = FontWeight.SemiBold, style = DashCamTypography.labelMedium) }
             }

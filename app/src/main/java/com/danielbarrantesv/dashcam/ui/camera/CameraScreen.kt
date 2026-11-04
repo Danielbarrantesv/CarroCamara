@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -76,6 +77,15 @@ fun CameraScreen(
     // Rebind camera whenever lensFacing changes OR on first composition
     LaunchedEffect(state.lensFacing) {
         viewModel.bindCamera(lifecycleOwner, previewView)
+    }
+
+    // Cleanup when leaving the screen (stops recording gracefully)
+    // The ViewModel's onCleared will also handle this, but we call cleanup
+    // explicitly so the recording stops before the screen disappears.
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.cleanup()
+        }
     }
 
     Box(
