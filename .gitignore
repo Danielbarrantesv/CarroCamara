@@ -34,3 +34,8 @@ upload/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local tools (JDK, Gradle, Android SDK)
+tools/
+gradle-8.9/
+local.properties
