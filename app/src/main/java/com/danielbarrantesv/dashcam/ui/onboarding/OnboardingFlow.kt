@@ -128,10 +128,13 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                 selected = selectedLanguage,
                 onSelect = { lang ->
                     selectedLanguage = lang
-                    // Apply immediately so the rest of the onboarding shows in the chosen language
-                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                        androidx.core.os.LocaleListCompat.forLanguageTags(lang.tag)
-                    )
+                    // Persist immediately
+                    val prefs = SettingsRepository(context)
+                    MainScope().launch {
+                        prefs.setLanguage(lang)
+                    }
+                    // Apply via LocaleHelper (AppCompatDelegate + LocaleManager + Locale.setDefault)
+                    com.danielbarrantesv.dashcam.util.LocaleHelper.applyLanguage(context, lang.tag)
                 },
                 onContinue = { step = 1 }
             )
@@ -163,9 +166,8 @@ fun OnboardingFlow(onFinish: () -> Unit) {
                     val qualityFinal = quality
                     val unitFinal = unit
                     val finalUri = customStorageUri
-                    val finalLang = selectedLanguage
+                    // Note: language was already persisted when selected in step 0
                     MainScope().launch {
-                        prefs.setLanguage(finalLang)
                         prefs.setStorageLimitGb(storageFinalGb)
                         prefs.setVideoQuality(qualityFinal)
                         prefs.setSpeedUnit(unitFinal)

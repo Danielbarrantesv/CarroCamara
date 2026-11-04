@@ -14,6 +14,7 @@ import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
 import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
 import com.danielbarrantesv.dashcam.util.FileUtils
+import com.danielbarrantesv.dashcam.util.LocaleHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
@@ -109,9 +110,11 @@ class SettingsViewModel @Inject constructor(
 
     fun setLanguage(lang: AppLanguage) = viewModelScope.launch {
         repo.setLanguage(lang)
-        // Apply immediately via AppCompatDelegate (works for resources loaded via R.string.*).
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang.tag))
-        // Recreate the activity so Compose UI recomposes with the new locale.
+        // Apply the locale change via LocaleHelper (which uses AppCompatDelegate
+        // + LocaleManager + Locale.setDefault under the hood).
+        LocaleHelper.applyLanguage(ctx, lang.tag)
+        // Recreate the activity so the locale wrapper in attachBaseContext
+        // re-applies with the new language.
         android.os.Handler(android.os.Looper.getMainLooper()).post {
             currentActivity?.recreate()
         }
