@@ -1,0 +1,157 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">Ihr Straßenzeuge</string>
+
+    <string name="onboarding_welcome_title">Willkommen bei DashCam</string>
+    <string name="onboarding_welcome_body">Verwandle dein Telefon in eine professionelle Dashcam. Schleifenaufzeichnung, GPS-Telemetrie und Berichte für deine Versicherung.</string>
+    <string name="onboarding_storage_title">Speicher konfigurieren</string>
+    <string name="onboarding_storage_body">Gib an, wie viel Speicherplatz für Videos zugewiesen werden soll. Wenn voll, werden die ältesten automatisch gelöscht.</string>
+    <string name="onboarding_storage_unit">GB</string>
+    <string name="onboarding_permissions_title">Erforderliche Berechtigungen</string>
+    <string name="onboarding_permissions_body">DashCam benötigt mehrere Berechtigungen, um im Hintergrund zu funktionieren.</string>
+    <string name="onboarding_start">Aufnahme starten</string>
+    <string name="onboarding_continue">Weiter</string>
+    <string name="onboarding_skip">Überspringen</string>
+
+    <string name="onboarding_language_title">Wähle deine Sprache</string>
+    <string name="onboarding_language_subtitle">App-Sprache wählen</string>
+    <string name="onboarding_language_continue">Weiter</string>
+    <string name="onboarding_folder_title">Video-Ordner</string>
+    <string name="onboarding_folder_body">Wähle, wo die aufgezeichneten Videos gespeichert werden sollen. Du kannst den App-Speicher verwenden oder einen benutzerdefinierten Ordner wählen (empfohlen: ein Ordner im internen Speicher oder einer SD-Karte).</string>
+    <string name="onboarding_folder_custom">Benutzerdefinierter Ordner</string>
+    <string name="onboarding_folder_default">Standardordner</string>
+    <string name="onboarding_folder_default_desc">App-Speicher (nicht von anderen Apps zugänglich)</string>
+    <string name="onboarding_folder_pick">Ordner wählen</string>
+    <string name="onboarding_folder_use_default">Standard verwenden</string>
+
+    <string name="onboarding_welcome_app_name">DashCam</string>
+    <string name="onboarding_welcome_tagline">Dein Straßenzeuge</string>
+    <string name="onboarding_welcome_button">Starten</string>
+
+    <string name="onboarding_perm_camera_title">Kamera</string>
+    <string name="onboarding_perm_camera_desc">Um Video aufzunehmen</string>
+    <string name="onboarding_perm_mic_title">Mikrofon</string>
+    <string name="onboarding_perm_mic_desc">Optionales Audio</string>
+    <string name="onboarding_perm_location_title">Standort</string>
+    <string name="onboarding_perm_location_desc">Geschwindigkeit, GPS-Route, Kilometerstand</string>
+    <string name="onboarding_perm_bg_location_title">Hintergrundstandort</string>
+    <string name="onboarding_perm_bg_location_desc">GPS wenn die App minimiert ist</string>
+    <string name="onboarding_perm_notifications_title">Benachrichtigungen</string>
+    <string name="onboarding_perm_notifications_desc">Aufnahmekontrolle und Warnungen</string>
+    <string name="onboarding_perm_grant_button">Berechtigungen gewähren</string>
+    <string name="onboarding_perm_bg_location_button">Hintergrundstandort anfordern</string>
+    <string name="onboarding_perm_bg_location_hint">Für Hintergrundstandort musst du den Standort nach dem Gewähren separat anfordern.</string>
+
+    <string name="onboarding_storage_quality_title">Videoqualität</string>
+    <string name="onboarding_storage_unit_title">Geschwindigkeitseinheit</string>
+    <string name="onboarding_storage_minutes_hint">Min. Video bei 1080p</string>
+
+    <string name="settings_section_camera">Kamera</string>
+    <string name="settings_section_others">Andere</string>
+    <string name="settings_section_permissions">Berechtigungen</string>
+    <string name="settings_section_language">Sprache</string>
+
+    <string name="settings_default_lens">Standardkamera</string>
+    <string name="settings_default_lens_back">Hinten</string>
+    <string name="settings_default_lens_front">Vorne</string>
+    <string name="settings_dual_camera">Doppelkamera</string>
+    <string name="settings_dual_camera_desc">Gleichzeitig mit Front- und Rückkamera aufnehmen (bald verfügbar)</string>
+
+    <string name="settings_videos_folder">Video-Ordner</string>
+    <string name="settings_change_location">Speicherort ändern</string>
+    <string name="settings_reset">Zurücksetzen</string>
+
+    <string name="settings_auto_start_desc">Startet die Aufnahme automatisch</string>
+    <string name="settings_keep_screen_on_desc">Bildschirm während der Aufnahme an lassen</string>
+    <string name="settings_audio_desc">Mikrofon während der Aufnahme</string>
+
+    <string name="settings_language_title">App-Sprache</string>
+    <string name="settings_language_desc">Sprache ändern. Wird sofort angewendet.</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">Version</string>
+    <string name="settings_about_author_label">Autor</string>
+    <string name="settings_about_repo_label">Repository</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
+
+    <string name="perm_camera_title">Kamera</string>
+    <string name="perm_camera_desc">Erforderlich für Videoaufnahme</string>
+    <string name="perm_mic_title">Mikrofon</string>
+    <string name="perm_mic_desc">Audio in Videos (optional)</string>
+    <string name="perm_location_title">Standort</string>
+    <string name="perm_location_desc">GPS, Geschwindigkeit und Route</string>
+    <string name="perm_bg_location_title">Hintergrundstandort</string>
+    <string name="perm_bg_location_desc">GPS wenn die App minimiert ist</string>
+    <string name="perm_notifications_title">Benachrichtigungen</string>
+    <string name="perm_notifications_desc">Aufnahme- und Aufprall-Warnungen</string>
+    <string name="perm_grant">Gewähren</string>
+    <string name="perm_open_settings">Einstellungen</string>
+    <string name="perm_granted">Gewährt</string>
+
+    <string name="rec_start">Aufnahme starten</string>
+    <string name="rec_stop">Aufnahme stoppen</string>
+    <string name="rec_recording">Aufnahme</string>
+    <string name="rec_rotate">Bildschirm drehen</string>
+    <string name="rec_switch_camera">Kamera wechseln</string>
+
+    <string name="hud_speed">Geschwindigkeit</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">Entfernung</string>
+    <string name="hud_gforce">G-Kraft</string>
+    <string name="hud_no_gps">Kein GPS-Signal</string>
+
+    <string name="nav_camera">Kamera</string>
+    <string name="nav_trips">Fahrten</string>
+    <string name="nav_reports">Berichte</string>
+    <string name="nav_transfer">Übertragung</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <string name="trips_title">Aufgezeichnete Fahrten</string>
+    <string name="trips_empty">Noch keine Fahrten aufgezeichnet.</string>
+    <string name="trips_delete">Fahrt löschen</string>
+    <string name="trips_export_report">PDF-Bericht erstellen</string>
+
+    <string name="reports_title">Versicherungsberichte</string>
+    <string name="reports_empty">Noch keine Berichte erstellt.</string>
+    <string name="reports_generate">Bericht erstellen</string>
+    <string name="reports_share">Teilen</string>
+    <string name="reports_open">Öffnen</string>
+    <string name="reports_delete">Löschen</string>
+    <string name="reports_generating">PDF-Bericht wird erstellt…</string>
+
+    <string name="transfer_title">WiFi-Übertragung</string>
+    <string name="transfer_start_server">Server starten</string>
+    <string name="transfer_stop_server">Server stoppen</string>
+    <string name="transfer_open_browser">Im Browser öffnen</string>
+
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_recording">Aufnahme</string>
+    <string name="settings_section_storage">Speicher</string>
+    <string name="settings_section_sensors">Sensoren</string>
+    <string name="settings_section_about">Über</string>
+    <string name="settings_video_quality">Videoqualität</string>
+    <string name="settings_segment_duration">Segmentdauer</string>
+    <string name="settings_storage_limit">Speicherlimit</string>
+    <string name="settings_audio_enabled">Audio aufnehmen</string>
+    <string name="settings_gforce_threshold">G-Kraft-Schwelle (g)</string>
+    <string name="settings_speed_unit">Geschwindigkeitseinheit</string>
+    <string name="settings_auto_start">Bei Ladegerät starten</string>
+    <string name="settings_keep_screen_on">Bildschirm an lassen</string>
+
+    <string name="notif_recording_title">DashCam zeichnet auf</string>
+    <string name="notif_event_title">Aufprall erkannt</string>
+    <string name="notif_server_title">DashCam-Server aktiv</string>
+
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_close">Schließen</string>
+
+
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">Dein Gerät unterstützt keine Doppelkamera-Aufnahme. Es wird nur die ausgewählte Kamera verwendet.</string>
+    <string name="camera_preview_unavailable">Vorschau auf dieser Kamera nicht verfügbar. Aufnahme funktioniert ohne Vorschau.</string>
+    <string name="camera_open_error">Kamera konnte nicht geöffnet werden: %1$s</string>
+    <string name="camera_not_ready">Kamera nicht bereit. Schließe und öffne die App erneut.</string>
+    <string name="camera_permission_denied">Kamera-Berechtigung nicht gewährt</string>
+</resources>

@@ -1,0 +1,166 @@
+<resources>
+    <string name="app_name">DashCam</string>
+    <string name="app_tagline">Votre témoin de route</string>
+
+    <string name="onboarding_welcome_title">Bienvenue sur DashCam</string>
+    <string name="onboarding_welcome_body">Transformez votre téléphone en dashcam professionnelle. Enregistrement en boucle, télémétrie GPS et rapports pour votre assurance.</string>
+    <string name="onboarding_storage_title">Configurez votre stockage</string>
+    <string name="onboarding_storage_body">Indiquez combien d\'espace disque allouer aux vidéos. Quand plein, les plus anciennes seront supprimées automatiquement.</string>
+    <string name="onboarding_storage_unit">Go</string>
+    <string name="onboarding_permissions_title">Autorisations requises</string>
+    <string name="onboarding_permissions_body">DashCam a besoin de plusieurs autorisations pour fonctionner en arrière-plan.</string>
+    <string name="onboarding_start">Commencer l\'enregistrement</string>
+    <string name="onboarding_continue">Continuer</string>
+    <string name="onboarding_skip">Passer</string>
+
+    <!-- Onboarding: language + folder steps -->
+    <string name="onboarding_language_title">Sélectionnez votre langue</string>
+    <string name="onboarding_language_subtitle">Choisissez la langue de l\'application</string>
+    <string name="onboarding_language_continue">Continuer</string>
+    <string name="onboarding_folder_title">Dossier des vidéos</string>
+    <string name="onboarding_folder_body">Sélectionnez où vous voulez que les vidéos soient enregistrées. Vous pouvez utiliser le stockage de l\'app ou choisir un dossier personnalisé (recommandé : un dossier dans le stockage interne ou une carte SD).</string>
+    <string name="onboarding_folder_custom">Dossier personnalisé</string>
+    <string name="onboarding_folder_default">Dossier par défaut</string>
+    <string name="onboarding_folder_default_desc">Stockage de l\'app (non accessible depuis d\'autres apps)</string>
+    <string name="onboarding_folder_pick">Choisir le dossier</string>
+    <string name="onboarding_folder_use_default">Utiliser par défaut</string>
+
+    <!-- Onboarding: welcome -->
+    <string name="onboarding_welcome_app_name">DashCam</string>
+    <string name="onboarding_welcome_tagline">Votre témoin de route</string>
+    <string name="onboarding_welcome_button">Commencer</string>
+
+    <!-- Onboarding: permissions -->
+    <string name="onboarding_perm_camera_title">Caméra</string>
+    <string name="onboarding_perm_camera_desc">Pour enregistrer la vidéo</string>
+    <string name="onboarding_perm_mic_title">Microphone</string>
+    <string name="onboarding_perm_mic_desc">Audio en option</string>
+    <string name="onboarding_perm_location_title">Localisation</string>
+    <string name="onboarding_perm_location_desc">Vitesse, itinéraire GPS, kilométrage</string>
+    <string name="onboarding_perm_bg_location_title">Localisation en arrière-plan</string>
+    <string name="onboarding_perm_bg_location_desc">GPS quand l\'app est minimisée</string>
+    <string name="onboarding_perm_notifications_title">Notifications</string>
+    <string name="onboarding_perm_notifications_desc">Contrôle de l\'enregistrement et alertes</string>
+    <string name="onboarding_perm_grant_button">Accorder les autorisations</string>
+    <string name="onboarding_perm_bg_location_button">Demander la localisation en arrière-plan</string>
+    <string name="onboarding_perm_bg_location_hint">Pour la localisation en arrière-plan, après avoir accordé la localisation, vous devez la demander séparément.</string>
+
+    <string name="onboarding_storage_quality_title">Qualité vidéo</string>
+    <string name="onboarding_storage_unit_title">Unité de vitesse</string>
+    <string name="onboarding_storage_minutes_hint">min de vidéo à 1080p</string>
+
+    <!-- Settings: sections -->
+    <string name="settings_section_camera">Caméra</string>
+    <string name="settings_section_others">Autres</string>
+    <string name="settings_section_permissions">Autorisations</string>
+    <string name="settings_section_language">Langue</string>
+
+    <!-- Settings: camera -->
+    <string name="settings_default_lens">Caméra par défaut</string>
+    <string name="settings_default_lens_back">Arrière</string>
+    <string name="settings_default_lens_front">Avant</string>
+    <string name="settings_dual_camera">Double caméra</string>
+    <string name="settings_dual_camera_desc">Enregistrer avec caméra avant et arrière à la fois (bientôt)</string>
+
+    <!-- Settings: storage -->
+    <string name="settings_videos_folder">Dossier des vidéos</string>
+    <string name="settings_change_location">Changer l\'emplacement</string>
+    <string name="settings_reset">Réinitialiser</string>
+
+    <!-- Settings: others -->
+    <string name="settings_auto_start_desc">Démarre l\'enregistrement automatiquement</string>
+    <string name="settings_keep_screen_on_desc">Garde l\'écran allumé pendant l\'enregistrement</string>
+    <string name="settings_audio_desc">Microphone pendant l\'enregistrement</string>
+
+    <!-- Settings: language -->
+    <string name="settings_language_title">Langue de l\'app</string>
+    <string name="settings_language_desc">Changez la langue. Appliqué immédiatement.</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_version_label">Version</string>
+    <string name="settings_about_author_label">Auteur</string>
+    <string name="settings_about_repo_label">Dépôt</string>
+    <string name="settings_about_author_value">Daniel Barrantes Villarevia</string>
+
+    <!-- Settings: permissions -->
+    <string name="perm_camera_title">Caméra</string>
+    <string name="perm_camera_desc">Requis pour enregistrer la vidéo</string>
+    <string name="perm_mic_title">Microphone</string>
+    <string name="perm_mic_desc">Audio dans les vidéos (optionnel)</string>
+    <string name="perm_location_title">Localisation</string>
+    <string name="perm_location_desc">GPS, vitesse et itinéraire</string>
+    <string name="perm_bg_location_title">Localisation en arrière-plan</string>
+    <string name="perm_bg_location_desc">GPS quand l\'app est minimisée</string>
+    <string name="perm_notifications_title">Notifications</string>
+    <string name="perm_notifications_desc">Alertes d\'enregistrement et d\'impact</string>
+    <string name="perm_grant">Accorder</string>
+    <string name="perm_open_settings">Paramètres</string>
+    <string name="perm_granted">Accordé</string>
+
+    <string name="rec_start">Démarrer l\'enregistrement</string>
+    <string name="rec_stop">Arrêter l\'enregistrement</string>
+    <string name="rec_recording">Enregistrement</string>
+    <string name="rec_rotate">Pivoter l\'écran</string>
+    <string name="rec_switch_camera">Changer de caméra</string>
+
+    <string name="hud_speed">Vitesse</string>
+    <string name="hud_speed_unit">km/h</string>
+    <string name="hud_distance">Distance</string>
+    <string name="hud_gforce">Force G</string>
+    <string name="hud_no_gps">Pas de signal GPS</string>
+
+    <string name="nav_camera">Caméra</string>
+    <string name="nav_trips">Trajets</string>
+    <string name="nav_reports">Rapports</string>
+    <string name="nav_transfer">Transfert</string>
+    <string name="nav_settings">Paramètres</string>
+
+    <string name="trips_title">Trajets enregistrés</string>
+    <string name="trips_empty">Aucun trajet enregistré.</string>
+    <string name="trips_delete">Supprimer le trajet</string>
+    <string name="trips_export_report">Générer le rapport PDF</string>
+
+    <string name="reports_title">Rapports d\'assurance</string>
+    <string name="reports_empty">Aucun rapport généré.</string>
+    <string name="reports_generate">Générer le rapport</string>
+    <string name="reports_share">Partager</string>
+    <string name="reports_open">Ouvrir</string>
+    <string name="reports_delete">Supprimer</string>
+    <string name="reports_generating">Génération du rapport PDF…</string>
+
+    <string name="transfer_title">Transfert WiFi</string>
+    <string name="transfer_start_server">Démarrer le serveur</string>
+    <string name="transfer_stop_server">Arrêter le serveur</string>
+    <string name="transfer_open_browser">Ouvrir dans le navigateur</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_section_recording">Enregistrement</string>
+    <string name="settings_section_storage">Stockage</string>
+    <string name="settings_section_sensors">Capteurs</string>
+    <string name="settings_section_about">À propos</string>
+    <string name="settings_video_quality">Qualité vidéo</string>
+    <string name="settings_segment_duration">Durée du segment</string>
+    <string name="settings_storage_limit">Limite de stockage</string>
+    <string name="settings_audio_enabled">Enregistrer l\'audio</string>
+    <string name="settings_gforce_threshold">Seuil de force G (g)</string>
+    <string name="settings_speed_unit">Unité de vitesse</string>
+    <string name="settings_auto_start">Démarrer lors du branchement du chargeur</string>
+    <string name="settings_keep_screen_on">Garder l\'écran allumé</string>
+
+    <string name="notif_recording_title">DashCam enregistre</string>
+    <string name="notif_event_title">Impact détecté</string>
+    <string name="notif_server_title">Serveur DashCam actif</string>
+
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_back">Retour</string>
+    <string name="action_close">Fermer</string>
+
+
+    <!-- Camera messages -->
+    <string name="camera_dual_not_supported">Votre appareil ne prend pas en charge l\'enregistrement double caméra. Seule la caméra sélectionnée sera utilisée.</string>
+    <string name="camera_preview_unavailable">Aperçu non disponible sur cette caméra. L\'enregistrement fonctionnera sans aperçu.</string>
+    <string name="camera_open_error">Impossible d\'ouvrir la caméra: %1$s</string>
+    <string name="camera_not_ready">Caméra non prête. Fermez et rouvrez l\'app.</string>
+    <string name="camera_permission_denied">Autorisation de caméra non accordée</string>
+</resources>

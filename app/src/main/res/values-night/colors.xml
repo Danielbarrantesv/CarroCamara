@@ -1,0 +1,8 @@
+<resources>
+    <!-- Override colors for light mode (dashcam is primarily dark, but we honor system if forced) -->
+    <color name="app_background">#FFF6F6F8</color>
+    <color name="app_surface">#FFFFFFFF</color>
+    <color name="app_surface_variant">#FFE4E4EA</color>
+    <color name="app_on_surface">#FF1A1A22</color>
+    <color name="app_on_surface_variant">#FF50505A</color>
+</resources>

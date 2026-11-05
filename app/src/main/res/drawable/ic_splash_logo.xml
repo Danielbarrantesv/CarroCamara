@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Camera body -->
+    <path
+        android:fillColor="@color/ic_launcher_foreground"
+        android:pathData="M24,40 h72 a8,8 0 0 1 8,8 v40 a8,8 0 0 1 -8,8 h-72 a8,8 0 0 1 -8,-8 v-40 a8,8 0 0 1 8,-8 z" />
+    <!-- Lens outer ring -->
+    <path
+        android:fillColor="@color/ic_launcher_background"
+        android:pathData="M60,52 m-20,0 a20,20 0 1 0 40,0 a20,20 0 1 0 -40,0 z" />
+    <!-- Lens inner -->
+    <path
+        android:fillColor="@color/ic_launcher_foreground"
+        android:pathData="M60,52 m-12,0 a12,12 0 1 0 24,0 a12,12 0 1 0 -24,0 z" />
+    <!-- Lens glass highlight -->
+    <path
+        android:fillColor="@color/ic_launcher_background"
+        android:pathData="M55,46 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0 z" />
+    <!-- REC dot -->
+    <path
+        android:fillColor="@color/brand_secondary"
+        android:pathData="M90,32 m-5,0 a5,5 0 1 0 10,0 a5,5 0 1 0 -10,0 z" />
+</vector>

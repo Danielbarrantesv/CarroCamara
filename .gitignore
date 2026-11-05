@@ -1,0 +1,43 @@
+skills/
+node_modules/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Android Studio / Gradle
+local.properties
+*.iml
+.gradle/
+build/
+.idea/
+.cxx/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystore (do not commit signing keys)
+*.jks
+*.keystore
+
+# Logs
+*.log
+
+# User uploads (don't commit)
+upload/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local tools (JDK, Gradle, Android SDK)
+tools/
+gradle-8.9/
+local.properties
+tool-results/
+gradle-8.9/
