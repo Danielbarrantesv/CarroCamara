@@ -173,7 +173,16 @@ class CameraViewModel @Inject constructor(
                 previewUseCase = preview
 
                 val quality = settings.videoQuality.first()
-                val recorder = buildRecorder(quality)
+                // For front camera, cap at HD — most front cameras don't support
+                // FHD+Preview simultaneously and throw "No supported surface combination".
+                val effectiveQuality = if (_state.value.lensFacing == CameraSelector.LENS_FACING_FRONT
+                    && (quality == VideoQuality.FHD || quality == VideoQuality.UHD)) {
+                    Log.i(TAG, "Front camera detected — capping quality to HD to avoid surface combination error")
+                    VideoQuality.HD
+                } else {
+                    quality
+                }
+                val recorder = buildRecorder(effectiveQuality)
                 val capture = VideoCapture.withOutput(recorder)
 
                 val selector = CameraSelector.Builder()
@@ -253,23 +262,43 @@ class CameraViewModel @Inject constructor(
                     // "No supported surface combination" crashes on devices
                     // whose camera doesn't support Preview + VideoCapture at the
                     // requested quality.
-                    try {
-                        provider.bindToLifecycle(cameraLifecycleOwner, selector, preview, capture)
-                        primaryCapture = capture
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Preview+VideoCapture bind failed, trying VideoCapture only", e)
+                    // Try 1: Preview + VideoCapture at effectiveQuality
+                    // Try 2: Preview + VideoCapture at HD
+                    // Try 3: Preview + VideoCapture at SD
+                    // Try 4: VideoCapture only (no preview) at SD
+                    var bound = false
+                    val qualitiesToTry = mutableListOf(effectiveQuality)
+                    if (effectiveQuality != VideoQuality.HD) qualitiesToTry.add(VideoQuality.HD)
+                    if (effectiveQuality != VideoQuality.SD) qualitiesToTry.add(VideoQuality.SD)
+
+                    for (q in qualitiesToTry) {
                         try {
-                            provider.bindToLifecycle(cameraLifecycleOwner, selector, capture)
-                            primaryCapture = capture
+                            val rec = buildRecorder(q)
+                            val cap = VideoCapture.withOutput(rec)
+                            provider.bindToLifecycle(cameraLifecycleOwner, selector, preview, cap)
+                            primaryCapture = cap
+                            Log.i(TAG, "Camera bound at quality=$q with preview")
+                            bound = true
+                            break
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Bind failed at quality=$q with preview: ${e.message}")
+                        }
+                    }
+
+                    if (!bound) {
+                        // Last resort: VideoCapture only, no preview, at SD
+                        try {
+                            val sdRecorder = buildRecorder(VideoQuality.SD)
+                            val sdCapture = VideoCapture.withOutput(sdRecorder)
+                            provider.bindToLifecycle(cameraLifecycleOwner, selector, sdCapture)
+                            primaryCapture = sdCapture
                             _state.value = _state.value.copy(
                                 error = ctx.getString(R.string.camera_preview_unavailable)
                             )
-                        } catch (e2: Exception) {
-                            // Final fallback: HD quality
-                            val hdRecorder = buildRecorder(VideoQuality.HD)
-                            val hdCapture = VideoCapture.withOutput(hdRecorder)
-                            provider.bindToLifecycle(cameraLifecycleOwner, selector, preview, hdCapture)
-                            primaryCapture = hdCapture
+                            Log.w(TAG, "Camera bound at SD quality, no preview (last resort)")
+                        } catch (e3: Exception) {
+                            Log.e(TAG, "All camera bind attempts failed", e3)
+                            throw e3
                         }
                     }
                     secondaryCapture = null
