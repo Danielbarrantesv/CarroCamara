@@ -51,6 +51,17 @@ enum class AppLanguage(val tag: String, val display: String) {
     }
 }
 
+/** Recording orientation — locks the camera screen to a specific orientation. */
+enum class RecordingOrientation(val label: String) {
+    AUTO("Automática"),
+    PORTRAIT("Vertical"),
+    LANDSCAPE("Horizontal");
+
+    companion object {
+        fun fromName(name: String?): RecordingOrientation = entries.firstOrNull { it.name == name } ?: AUTO
+    }
+}
+
 @Singleton
 class SettingsRepository @Inject constructor(
     @ApplicationContext private val ctx: Context
@@ -70,6 +81,7 @@ class SettingsRepository @Inject constructor(
         val DUAL_CAMERA = booleanPreferencesKey("dual_camera")
         val DEFAULT_LENS = intPreferencesKey("default_lens") // 0 = back, 1 = front
         val LANGUAGE = stringPreferencesKey("language")
+        val ORIENTATION = stringPreferencesKey("orientation")
     }
 
     val hasCompletedOnboarding: Flow<Boolean> =
@@ -161,4 +173,11 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setLanguage(lang: AppLanguage) =
         ctx.dataStore.edit { it[Keys.LANGUAGE] = lang.tag }
+
+    // ---- Recording orientation ----
+    val orientation: Flow<RecordingOrientation> =
+        ctx.dataStore.data.map { RecordingOrientation.fromName(it[Keys.ORIENTATION]) }
+
+    suspend fun setOrientation(o: RecordingOrientation) =
+        ctx.dataStore.edit { it[Keys.ORIENTATION] = o.name }
 }

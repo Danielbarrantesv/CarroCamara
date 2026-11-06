@@ -23,6 +23,7 @@
     <string name="onboarding_folder_default_desc">アプリストレージ（他のアプリからアクセス不可）</string>
     <string name="onboarding_folder_pick">フォルダを選択</string>
     <string name="onboarding_folder_use_default">デフォルトを使用</string>
+    <string name="onboarding_folder_pick_required">続行するにはフォルダを選択</string>
 
     <string name="onboarding_welcome_app_name">DashCam</string>
     <string name="onboarding_welcome_tagline">あなたの運転の証人</string>

@@ -157,6 +157,14 @@ fun SettingsScreen(
                     checked = state.dualCameraEnabled,
                     onCheckedChange = viewModel::setDualCamera
                 )
+                DividerLine()
+                QualityRow(
+                    title = "Orientación de grabación",
+                    subtitle = state.orientation.label,
+                    options = com.danielbarrantesv.dashcam.data.prefs.RecordingOrientation.entries.map { it.label to it },
+                    selected = state.orientation,
+                    onSelect = viewModel::setOrientation
+                )
             }
         }
 
@@ -319,7 +327,7 @@ fun SettingsScreen(
         item {
             SectionHeader(stringResource(R.string.settings_section_about))
             SettingsCard {
-                InfoRow(stringResource(R.string.settings_about_version_label), "1.0.8")
+                InfoRow(stringResource(R.string.settings_about_version_label), "1.1.3")
                 DividerLine()
                 InfoRow(stringResource(R.string.settings_about_author_label), stringResource(R.string.settings_about_author_value))
                 DividerLine()

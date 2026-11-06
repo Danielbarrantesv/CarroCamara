@@ -23,6 +23,7 @@
     <string name="onboarding_folder_default_desc">App-Speicher (nicht von anderen Apps zugänglich)</string>
     <string name="onboarding_folder_pick">Ordner wählen</string>
     <string name="onboarding_folder_use_default">Standard verwenden</string>
+    <string name="onboarding_folder_pick_required">Ordner wählen zum Fortfahren</string>
 
     <string name="onboarding_welcome_app_name">DashCam</string>
     <string name="onboarding_welcome_tagline">Dein Straßenzeuge</string>

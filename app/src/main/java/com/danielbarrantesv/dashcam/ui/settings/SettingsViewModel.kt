@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.danielbarrantesv.dashcam.MainActivity
 import com.danielbarrantesv.dashcam.data.prefs.AppLanguage
+import com.danielbarrantesv.dashcam.data.prefs.RecordingOrientation
 import com.danielbarrantesv.dashcam.data.prefs.SettingsRepository
 import com.danielbarrantesv.dashcam.data.prefs.SpeedUnit
 import com.danielbarrantesv.dashcam.data.prefs.VideoQuality
@@ -36,7 +37,8 @@ data class SettingsUiState(
     val storageDescription: String = "",
     val dualCameraEnabled: Boolean = false,
     val defaultLens: Int = 0,
-    val language: AppLanguage = AppLanguage.ES
+    val language: AppLanguage = AppLanguage.ES,
+    val orientation: RecordingOrientation = RecordingOrientation.AUTO
 )
 
 @HiltViewModel
@@ -49,9 +51,9 @@ class SettingsViewModel @Inject constructor(
         combine(repo.audioEnabled, repo.videoQuality, repo.segmentDurationSec) { a, b, c -> Triple(a, b, c) },
         combine(repo.storageLimitGb, repo.gforceThreshold, repo.speedUnit) { a, b, c -> Triple(a, b, c) },
         combine(repo.autoStartOnPower, repo.keepScreenOn, repo.dualCameraEnabled, repo.defaultLens) { a, b, c, d -> listOf(a, b, c, d) },
-        combine(repo.storageUri, repo.language) { uri, lang -> uri to lang }
+        combine(repo.storageUri, repo.language, repo.orientation) { uri, lang, ori -> Triple(uri, lang, ori) }
     ) { rec, sens, other, storageAndLang ->
-        val (storageUri, lang) = storageAndLang
+        val (storageUri, lang, orientation) = storageAndLang
         SettingsUiState(
             audioEnabled = rec.first,
             videoQuality = rec.second,
@@ -66,7 +68,8 @@ class SettingsViewModel @Inject constructor(
             storageUri = storageUri,
             storageDescription = storageUri?.let { describeUri(it) }
                 ?: FileUtils.defaultStorageDescription(ctx),
-            language = lang
+            language = lang,
+            orientation = orientation
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SettingsUiState())
 
@@ -90,6 +93,7 @@ class SettingsViewModel @Inject constructor(
     fun setKeepScreenOn(v: Boolean) = viewModelScope.launch { repo.setKeepScreenOn(v) }
     fun setDualCamera(v: Boolean) = viewModelScope.launch { repo.setDualCameraEnabled(v) }
     fun setDefaultLens(lens: Int) = viewModelScope.launch { repo.setDefaultLens(lens) }
+    fun setOrientation(o: RecordingOrientation) = viewModelScope.launch { repo.setOrientation(o) }
 
     fun setStorageUri(uri: Uri?) = viewModelScope.launch {
         if (uri != null) {

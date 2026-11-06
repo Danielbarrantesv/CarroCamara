@@ -485,12 +485,22 @@ private fun StorageFolderStep(
 
         Button(
             onClick = onContinue,
+            enabled = customUri != null,
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Primary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         ) {
-            Text(stringResource(R.string.onboarding_continue), color = Color.Black, fontWeight = FontWeight.SemiBold)
+            Text(
+                if (customUri != null) stringResource(R.string.onboarding_continue)
+                else stringResource(R.string.onboarding_folder_pick_required),
+                color = if (customUri != null) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold
+            )
             Spacer(Modifier.width(8.dp))
-            Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = Color.Black)
+            Icon(Icons.Filled.ArrowForward, contentDescription = null, tint = if (customUri != null) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

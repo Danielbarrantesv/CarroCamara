@@ -400,10 +400,9 @@ class CameraViewModel @Inject constructor(
                 RecordingService.start(ctx)
 
                 // Keep screen on while recording (if user has the setting enabled)
-                val keepScreenOn = settings.keepScreenOn.first()
-                if (keepScreenOn) {
-                    setKeepScreenOn(true)
-                }
+                // The Activity reference is passed from CameraScreen via setKeepScreenOn()
+                // — we can't call it here because ctx is ApplicationContext, not Activity.
+                // CameraScreen observes isRecording and calls setKeepScreenOn().
 
                 val primaryLens = lensLabel(_state.value.lensFacing)
                 startNextSegment(capture, primaryLens, audioEnabled, storageTreeUri)
@@ -722,8 +721,7 @@ class CameraViewModel @Inject constructor(
         primaryRecording = null
         secondaryRecording = null
 
-        // Disable keep-screen-on
-        setKeepScreenOn(false)
+        // Keep screen on is handled by CameraScreen (which has the Activity reference)
 
         viewModelScope.launch(Dispatchers.IO) {
             val endMs = System.currentTimeMillis()
@@ -815,12 +813,11 @@ class CameraViewModel @Inject constructor(
     }
 
     /**
-     * Sets FLAG_KEEP_SCREEN_ON on the Activity's window so the screen doesn't
-     * turn off while recording.
+     * Sets FLAG_KEEP_SCREEN_ON on the given Activity's window so the screen
+     * doesn't turn off while recording.
      */
-    private fun setKeepScreenOn(enabled: Boolean) {
+    fun setKeepScreenOn(activity: android.app.Activity?, enabled: Boolean) {
         try {
-            val activity = findActivity(ctx)
             activity?.runOnUiThread {
                 if (enabled) {
                     activity.window?.addFlags(
@@ -835,13 +832,6 @@ class CameraViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.w(TAG, "setKeepScreenOn failed", e)
         }
-    }
-
-    /** Walks up the Context chain to find the Activity. */
-    private tailrec fun findActivity(ctx: Context): android.app.Activity? = when (ctx) {
-        is android.app.Activity -> ctx
-        is android.content.ContextWrapper -> findActivity(ctx.baseContext)
-        else -> null
     }
 
     companion object {

@@ -112,6 +112,18 @@ fun CameraScreen() {
         }
     }
 
+    // Keep screen on while recording — the ViewModel can't do this because it
+    // only has ApplicationContext. We have the Activity here, so we apply
+    // FLAG_KEEP_SCREEN_ON when isRecording becomes true, and clear it when false.
+    LaunchedEffect(state.isRecording) {
+        viewModel.setKeepScreenOn(activity, state.isRecording)
+    }
+
+    // Always keep screen on while on the camera screen (even if not recording)
+    LaunchedEffect(Unit) {
+        viewModel.setKeepScreenOn(activity, true)
+    }
+
     // IMPORTANT: We do NOT call viewModel.cleanup() on dispose.
     // The ViewModel is activity-scoped, so it survives tab switches.
     // The camera and recording continue while the user is in other tabs.
@@ -120,6 +132,10 @@ fun CameraScreen() {
         onDispose {
             // Just release the preview surface — keep recording alive
             viewModel.releasePreview()
+            // Clear keep-screen-on when leaving the camera screen (if not recording)
+            if (!state.isRecording) {
+                viewModel.setKeepScreenOn(activity, false)
+            }
         }
     }
 

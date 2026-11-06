@@ -24,6 +24,7 @@
     <string name="onboarding_folder_default_desc">Stockage de l\'app (non accessible depuis d\'autres apps)</string>
     <string name="onboarding_folder_pick">Choisir le dossier</string>
     <string name="onboarding_folder_use_default">Utiliser par défaut</string>
+    <string name="onboarding_folder_pick_required">Sélectionnez un dossier pour continuer</string>
 
     <!-- Onboarding: welcome -->
     <string name="onboarding_welcome_app_name">DashCam</string>

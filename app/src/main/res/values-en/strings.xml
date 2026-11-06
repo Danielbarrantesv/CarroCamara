@@ -23,6 +23,7 @@
     <string name="onboarding_folder_default_desc">App storage (not accessible from other apps)</string>
     <string name="onboarding_folder_pick">Choose folder</string>
     <string name="onboarding_folder_use_default">Use default</string>
+    <string name="onboarding_folder_pick_required">Select a folder to continue</string>
     <!-- Onboarding: welcome -->
     <string name="onboarding_welcome_app_name">DashCam</string>
     <string name="onboarding_welcome_tagline">Your road witness</string>

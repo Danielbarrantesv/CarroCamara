@@ -23,6 +23,7 @@
     <string name="onboarding_folder_default_desc">应用存储（其他应用无法访问）</string>
     <string name="onboarding_folder_pick">选择文件夹</string>
     <string name="onboarding_folder_use_default">使用默认</string>
+    <string name="onboarding_folder_pick_required">选择文件夹以继续</string>
 
     <string name="onboarding_welcome_app_name">DashCam</string>
     <string name="onboarding_welcome_tagline">您的行车见证人</string>
