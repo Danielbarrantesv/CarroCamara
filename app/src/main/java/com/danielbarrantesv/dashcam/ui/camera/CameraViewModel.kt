@@ -38,6 +38,7 @@ import com.danielbarrantesv.dashcam.service.RecordingService
 import com.danielbarrantesv.dashcam.util.FileUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,6 +112,7 @@ class CameraViewModel @Inject constructor(
     private var currentSegmentStartMs: Long = 0L
 
     private var timerJob: Job? = null
+    private var segmentTimerJob: Job? = null
     private var gpsJob: Job? = null
     private var gForceJob: Job? = null
 
@@ -368,6 +370,12 @@ class CameraViewModel @Inject constructor(
                 // The service acquires a PARTIAL_WAKE_LOCK and shows a persistent notification.
                 RecordingService.start(ctx)
 
+                // Keep screen on while recording (if user has the setting enabled)
+                val keepScreenOn = settings.keepScreenOn.first()
+                if (keepScreenOn) {
+                    setKeepScreenOn(true)
+                }
+
                 val primaryLens = lensLabel(_state.value.lensFacing)
                 startNextSegment(capture, primaryLens, audioEnabled, storageTreeUri)
 
@@ -383,6 +391,7 @@ class CameraViewModel @Inject constructor(
                 }
 
                 startTimer()
+                startSegmentTimer()
                 startGForceStream()
             } catch (e: Exception) {
                 Log.e(TAG, "startRecording failed", e)
@@ -483,8 +492,10 @@ class CameraViewModel @Inject constructor(
                 val fileExists = outFile.exists() && outFile.length() > 0
 
                 if (!hasError || fileExists) {
-                    // Success OR partial file saved despite error — register it
-                    viewModelScope.launch {
+                    // Success OR partial file saved despite error — register it.
+                    // Run on IO dispatcher so moveToCustomStorage (which can be a large
+                    // file copy) doesn't block the main thread and cause an ANR.
+                    viewModelScope.launch(Dispatchers.IO) {
                         val durationMs = System.currentTimeMillis() - currentSegmentStartMs
                         // If a custom storage folder is set, move the file there
                         val finalUri = if (fileExists) {
@@ -492,8 +503,6 @@ class CameraViewModel @Inject constructor(
                         } else null
                         val finalPath = finalUri?.toString() ?: outFile.absolutePath
                         val sizeBytes = if (storageTreeUri != null) {
-                            // File was moved to SAF — get size before move (already done above)
-                            // Use a reasonable estimate if file was already moved
                             outFile.length().takeIf { it > 0 } ?: 0L
                         } else {
                             outFile.length()
@@ -539,6 +548,35 @@ class CameraViewModel @Inject constructor(
                 _state.value = _state.value.copy(
                     durationSec = (System.currentTimeMillis() - tripStartMs) / 1000
                 )
+            }
+        }
+    }
+
+    /**
+     * Segment timer: stops the current recording every segmentDurationSec seconds.
+     * The Finalize callback in handleVideoEvent will then save the segment and
+     * automatically start the next one. This is what creates the "loop recording"
+     * effect with multiple files instead of one giant file.
+     */
+    private fun startSegmentTimer() {
+        segmentTimerJob?.cancel()
+        segmentTimerJob = viewModelScope.launch {
+            val segmentSec = settings.segmentDurationSec.first()
+            Log.i(TAG, "Segment timer started: ${segmentSec}s per segment")
+            while (_state.value.isRecording) {
+                delay(segmentSec * 1000L)
+                if (!_state.value.isRecording) break
+                Log.i(TAG, "Segment timer: stopping segment ${segmentIndex - 1} after ${segmentSec}s")
+                try {
+                    primaryRecording?.stop()
+                } catch (e: Exception) {
+                    Log.w(TAG, "Segment timer: stop() failed", e)
+                }
+                // The Finalize callback will handle saving + starting next segment.
+                // Also stop the secondary recording if dual camera is active.
+                try {
+                    secondaryRecording?.stop()
+                } catch (_: Exception) {}
             }
         }
     }
@@ -640,17 +678,25 @@ class CameraViewModel @Inject constructor(
     }
 
     private fun stopRecording() {
-        try { primaryRecording?.stop() } catch (_: Exception) {}
-        try { secondaryRecording?.stop() } catch (_: Exception) {}
-        primaryRecording = null
-        secondaryRecording = null
+        // Cancel timers first so they don't try to stop() the recording again
+        segmentTimerJob?.cancel()
         timerJob?.cancel()
         gForceJob?.cancel()
 
         // Stop the foreground service — releases wake lock and removes notification.
         RecordingService.stop(ctx)
 
-        viewModelScope.launch {
+        // Stop recordings — Finalize callback will fire asynchronously and save
+        // the last segment. We don't wait for it here to avoid blocking the UI.
+        try { primaryRecording?.stop() } catch (_: Exception) {}
+        try { secondaryRecording?.stop() } catch (_: Exception) {}
+        primaryRecording = null
+        secondaryRecording = null
+
+        // Disable keep-screen-on
+        setKeepScreenOn(false)
+
+        viewModelScope.launch(Dispatchers.IO) {
             val endMs = System.currentTimeMillis()
             val durationSec = (endMs - tripStartMs) / 1000
             val st = _state.value
@@ -689,6 +735,7 @@ class CameraViewModel @Inject constructor(
         if (_state.value.isRecording) {
             stopRecording()
         }
+        segmentTimerJob?.cancel()
         timerJob?.cancel()
         gpsJob?.cancel()
         gForceJob?.cancel()
@@ -736,6 +783,36 @@ class CameraViewModel @Inject constructor(
             Math.sin(dLon / 2) * Math.sin(dLon / 2)
         val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
         return r * c
+    }
+
+    /**
+     * Sets FLAG_KEEP_SCREEN_ON on the Activity's window so the screen doesn't
+     * turn off while recording.
+     */
+    private fun setKeepScreenOn(enabled: Boolean) {
+        try {
+            val activity = findActivity(ctx)
+            activity?.runOnUiThread {
+                if (enabled) {
+                    activity.window?.addFlags(
+                        android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    )
+                } else {
+                    activity.window?.clearFlags(
+                        android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "setKeepScreenOn failed", e)
+        }
+    }
+
+    /** Walks up the Context chain to find the Activity. */
+    private tailrec fun findActivity(ctx: Context): android.app.Activity? = when (ctx) {
+        is android.app.Activity -> ctx
+        is android.content.ContextWrapper -> findActivity(ctx.baseContext)
+        else -> null
     }
 
     companion object {
