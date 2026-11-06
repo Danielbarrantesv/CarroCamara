@@ -145,8 +145,8 @@ fun SettingsScreen(
             SettingsCard {
                 QualityRow(
                     title = stringResource(R.string.settings_default_lens),
-                    subtitle = if (state.defaultLens == 0) stringResource(R.string.settings_default_lens_back) else stringResource(R.string.settings_default_lens_front),
-                    options = listOf(stringResource(R.string.settings_default_lens_back) to 0, stringResource(R.string.settings_default_lens_front) to 1),
+                    subtitle = if (state.defaultLens == 1) stringResource(R.string.settings_default_lens_back) else stringResource(R.string.settings_default_lens_front),
+                    options = listOf(stringResource(R.string.settings_default_lens_back) to 1, stringResource(R.string.settings_default_lens_front) to 0),
                     selected = state.defaultLens,
                     onSelect = viewModel::setDefaultLens
                 )

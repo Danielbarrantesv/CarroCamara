@@ -160,9 +160,9 @@ class SettingsRepository @Inject constructor(
     suspend fun setDualCameraEnabled(v: Boolean) =
         ctx.dataStore.edit { it[Keys.DUAL_CAMERA] = v }
 
-    // ---- Default lens (0 = back, 1 = front) ----
+    // ---- Default lens (CameraSelector.LENS_FACING_FRONT = 0, LENS_FACING_BACK = 1) ----
     val defaultLens: Flow<Int> =
-        ctx.dataStore.data.map { it[Keys.DEFAULT_LENS] ?: 0 }
+        ctx.dataStore.data.map { it[Keys.DEFAULT_LENS] ?: 1 }
 
     suspend fun setDefaultLens(lens: Int) =
         ctx.dataStore.edit { it[Keys.DEFAULT_LENS] = lens.coerceIn(0, 1) }
